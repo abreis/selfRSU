@@ -79,6 +79,7 @@ namespace ns3
       double m_velocity;            // vehicle's velocity.
       double m_acceleration;        // vehicle's acceleration.
       int m_direction;              // vehicle's direction.
+      bool m_brake;
       Ptr<Model> m_model;           // vehicle's IDM mobility model.
       Ptr<LaneChange> m_laneChange; // vehicle's IDM/MOBILE lanechange Model.
       int m_vehicleId;              // vehicle's id
@@ -205,6 +206,10 @@ namespace ns3
       */
       int GetDirection();
       /**
+      * \returns the braking decision of the Vehicle.
+      */
+      bool GetBrake();
+      /**
       * \returns the direction of the Vehicle in verbose 'W' (1) or 'E' (-1).
       */
       char GetCharDirection();
@@ -212,6 +217,10 @@ namespace ns3
       * \param value the direction of the Vehicle. Usually (+1) or (-1) used in the Highway. 
       */
       void SetDirection(int value);
+      /**
+      * \param value whether the vehicle brakes [true/false]
+      */
+      void SetBrake(bool value);
       /**
       * \param vwd the Vehicle in front.
       *

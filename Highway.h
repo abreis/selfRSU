@@ -87,6 +87,9 @@ namespace ns3
       YansWifiChannelHelper m_wifiChannelHelper; // a wifi channel helper apply to setup vehicles Wifi
       Ptr<YansWifiChannel> m_wifiChannel;   //the common Wifi Channel created by Highway which is being shared by the vehicles to communicate.
 
+      int m_trafficlanes;
+      bool m_brake;
+
       /// Initializes the Highway and raises the event InitVehicle.
       void InitHighway();
       /// Injects Vehicles based on given minimum gap and percentage p.
@@ -332,6 +335,12 @@ namespace ns3
 	  * \param random variable from desirable distribution
 	  */
 	  void SetSpeedRV(RandomVariable rv);
+
+	  void SetTrafficLanes(int value);
+	  void SetBrake(bool value);
+	  int GetTrafficLanes();
+	  bool GetBrake();
+
 	  /**
       * it will add the vehicle in to the Highway based on the vehicle lane and direction to the appropriate Highway list.
       */

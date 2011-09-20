@@ -95,6 +95,8 @@ static Ptr<Vehicle> CreateVehicle(Ptr<Highway> highway, int lane, int direction)
 	vhc->SetLength(4);
 	vhc->SetWidth(2);
 
+	vhc->SetBrake(highway->GetBrake());
+
 	return vhc;
 }
 
@@ -194,7 +196,7 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 
 	// Initiate exponential generation for lane1dir1
 	ExponentialAddVehicles(highway, 1, 1);
-//	ExponentialAddVehicles(highway, 2, -1);		// comment to get 1 lane traffic only
+	if(highway->GetTrafficLanes()==2) ExponentialAddVehicles(highway, 2, -1);
 
 	return true;
 }
@@ -268,7 +270,7 @@ static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address addr
 		 */
 		if(veh->GetDirection()==1) // don't break opposite-lane vehicles
 		{
-//			veh->SetAcceleration(-5.0);					// comment to stop braking
+			if(veh->GetBrake()) veh->SetAcceleration(-5.0);
 			cout << "INFO " << nowtime.ns3::Time::GetSeconds() << " STOP " << veh->GetVehicleId() << ' ' <<  veh->GetPosition().x << '\n';
 		}
 
@@ -350,13 +352,20 @@ int main (int argc, char *argv[])
 
 	// Defaults
 	float simTime=1000.0;		// 200s to fill 6km road
-	int runNumber=1;
 //	double transmissionPower=18.9; // not enough
 	double transmissionPower=21.9; //
 
+	int runNumber=1;
+	double density=0.0039;
+	int nLanes=2;
+	bool doBrake=1;
 
 	CommandLine cmd;
 	cmd.AddValue ("rn", "run number", runNumber);
+	cmd.AddValue ("lanes", "traffic lanes [1,2]", nLanes);
+	cmd.AddValue ("density", "density", density);
+	cmd.AddValue ("brake", "brake [0,1]", doBrake);
+
 	cmd.Parse(argc, argv);
 
 	// Setup seed and run-number (to affect random variable outcome of different runs)
@@ -364,10 +373,15 @@ int main (int argc, char *argv[])
 	SeedManager::SetSeed(1);
 	SeedManager::SetRun(runNumber);
 
-	cout << "DEBUG RUN " << SeedManager::GetRun() << '\n';
+	cout 	<< "DEBUG run " << SeedManager::GetRun()
+			<< " density " << density
+			<< " nLanes " << nLanes
+			<< " brake " << (doBrake?"yes":"no")
+			<< '\n';
 
 	// Vehicle distribution
-	double lambdaS=0.0039*30; // veh/m * m/s
+
+	double lambdaS=density*30; // veh/m * m/s
 	// The next line is gettin an exponential variable with seconds per vehicle, and an upper bound 5 times higher
 	RandomVariable RV1 = ExponentialVariable(1/(lambdaS), 5/lambdaS);	// mean, upperbound
 
@@ -382,6 +396,9 @@ int main (int argc, char *argv[])
 	highway->SetDeltaT(deltaT);						// Mobility step, defined above
 	highway->SetFlowRVPositiveDirection(RV1);		// Save distribution with Highway
   
+	highway->SetTrafficLanes(nLanes);
+	highway->SetBrake(doBrake);
+
 	// Update the transmission range of wifi shared in the Highway.
 	YansWifiPhyHelper tempHelper = highway->GetYansWifiPhyHelper();
 	tempHelper.Set("TxPowerStart",DoubleValue(transmissionPower));
