@@ -110,7 +110,7 @@ namespace ns3
 	  /**
       * An event called for each step of mobility for each Vehicle inside the Highway.
       * It gives the Highway, the Vehicle, and value of dt.
-      * If we return true, it means the Cehicle at this step is being controlled manually by the user.
+      * If we return true, it means the Vehicle at this step is being controlled manually by the user.
       * If we return false, the Vehicle mobility (position, velocity, acceleration) is ruled by the car following conditions.
 	  * this callback must point to the function which handles such event.
       */
@@ -154,7 +154,7 @@ namespace ns3
       */
       Ptr<Model> CreateTruckModel();
 	  /** 
-	  * Create a Lange Change model similar to a sedan. 
+	  * Create a Lane Change model similar to a sedan.
 	  */
 	  Ptr<LaneChange> CreateSedanLaneChangeModel();
 	  /** 

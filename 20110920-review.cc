@@ -197,8 +197,7 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	// Initiate exponential generation for lane1dir1
 	ExponentialAddVehicles(highway, 1, 1);
 
-	// TODO if (twoDirections) then
-//	if(highway->GetTrafficLanes()==2) ExponentialAddVehicles(highway, 2, -1);
+	if(highway->GetTwoDirectional()==true) ExponentialAddVehicles(highway, 2, -1);
 
 	return true;
 }
@@ -236,7 +235,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 		}
 	}
 
-	return true;
+	return true;	// TODO Return false to have mobility model act?
 }
 
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address)
@@ -360,10 +359,12 @@ int main (int argc, char *argv[])
 	int runNumber=1;
 	double density=0.0039;
 	bool doBrake=1;
+	bool twoDir=true;
 
 	CommandLine cmd;
 	cmd.AddValue ("rn", "run number", runNumber);
 	cmd.AddValue ("density", "density", density);
+	cmd.AddValue ("twodir", "two directions", twoDir);
 	cmd.AddValue ("brake", "brake [0,1]", doBrake);
 
 	cmd.Parse(argc, argv);
@@ -375,6 +376,7 @@ int main (int argc, char *argv[])
 
 	cout 	<< "DEBUG run " << SeedManager::GetRun()
 			<< " density " << density
+			<< " twoDir " << (twoDir?"yes":"no")
 			<< " brake " << (doBrake?"yes":"no")
 			<< '\n';
 
