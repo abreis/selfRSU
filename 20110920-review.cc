@@ -196,7 +196,9 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 
 	// Initiate exponential generation for lane1dir1
 	ExponentialAddVehicles(highway, 1, 1);
-	if(highway->GetTrafficLanes()==2) ExponentialAddVehicles(highway, 2, -1);
+
+	// TODO if (twoDirections) then
+//	if(highway->GetTrafficLanes()==2) ExponentialAddVehicles(highway, 2, -1);
 
 	return true;
 }
@@ -357,12 +359,10 @@ int main (int argc, char *argv[])
 
 	int runNumber=1;
 	double density=0.0039;
-	int nLanes=2;
 	bool doBrake=1;
 
 	CommandLine cmd;
 	cmd.AddValue ("rn", "run number", runNumber);
-	cmd.AddValue ("lanes", "traffic lanes [1,2]", nLanes);
 	cmd.AddValue ("density", "density", density);
 	cmd.AddValue ("brake", "brake [0,1]", doBrake);
 
@@ -375,7 +375,6 @@ int main (int argc, char *argv[])
 
 	cout 	<< "DEBUG run " << SeedManager::GetRun()
 			<< " density " << density
-			<< " nLanes " << nLanes
 			<< " brake " << (doBrake?"yes":"no")
 			<< '\n';
 
@@ -389,15 +388,13 @@ int main (int argc, char *argv[])
 	// Setup parameters for highway
 	highway->SetHighwayLength(12000);				//
 	highway->SetLaneWidth(5);
-	highway->SetNumberOfLanes(4);					//
+	highway->SetNumberOfLanes(1);					// m_numberOfLanes: number of lanes per direction (max 5), see Highway.h
 	highway->SetChangeLane(false);					// No lane change
 	highway->SetTwoDirectional(true);				// Two directions
 	highway->SetAutoInject(false);					// Manual injection
 	highway->SetDeltaT(deltaT);						// Mobility step, defined above
 	highway->SetFlowRVPositiveDirection(RV1);		// Save distribution with Highway
-  
-	highway->SetTrafficLanes(nLanes);
-	highway->SetBrake(doBrake);
+  	highway->SetBrake(doBrake);						// Whether vehicles break with emergency message
 
 	// Update the transmission range of wifi shared in the Highway.
 	YansWifiPhyHelper tempHelper = highway->GetYansWifiPhyHelper();

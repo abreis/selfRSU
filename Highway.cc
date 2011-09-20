@@ -724,19 +724,9 @@ namespace ns3
 	  m_RVFlowDirPos = rv;
   }
 
-  void Highway::SetTrafficLanes(int value)
-  {
-	  m_trafficlanes = value;
-  }
-
   void Highway::SetBrake(bool value)
   {
 	  m_brake = value;
-  }
-
-  int Highway::GetTrafficLanes()
-  {
-	  return m_trafficlanes;
   }
 
   bool Highway::GetBrake()

@@ -37,10 +37,10 @@ namespace ns3
   * \brief Highway is a place holder of the Vehicle (s) which manages each step of the Vehicle mobility.
   * 
   * A Highway has up to total 10 lists (queue of lanes), maximum 5 (lanes) for each direction. At each step (interval dt), Highway 
-  * browse vehicles of each lane in order of their poistions. Highway moves each Vehicle or does the change of lane based on the
+  * browses vehicles of each lane in order of their positions. Highway moves each Vehicle or does the change of lane based on the
   * required information given by each vehicle and its adjacent vehicles following IDM Model and LaneChange rules. 
   * It is possible to add vehicles to the Highway manually, or we can set the Highway to do so automatically (AutoInjection).
-  * Vehicle depoloyments can happen at InitHighway or through handling the InitVehicle event raised by Highway. Although, it is possible to 
+  * Vehicle deployments can happen at InitHighway or through handling the InitVehicle event raised by Highway. Although, it is possible to
   * add vehicles to the highway at anytime of simulation.
   * Also, Highway raises a ControlVehicle event at each passed interval dt to give possibility to access/control Vehicles of the Highway.
   * Vehicles can communicate wirelessly at anytime using the shared WifiChannel given by Highway, 
@@ -85,10 +85,8 @@ namespace ns3
       NqosWifiMacHelper m_wifiMacHelper;    // a wifi mac helper apply to setup vehicles Wifi
       YansWifiPhyHelper m_wifiPhyHelper;    // a wifi phy helper apply to setup vehicles Wifi
       YansWifiChannelHelper m_wifiChannelHelper; // a wifi channel helper apply to setup vehicles Wifi
-      Ptr<YansWifiChannel> m_wifiChannel;   //the common Wifi Channel created by Highway which is being shared by the vehicles to communicate.
-
-      int m_trafficlanes;
-      bool m_brake;
+      Ptr<YansWifiChannel> m_wifiChannel;   // the common Wifi Channel created by Highway which is being shared by the vehicles to communicate.
+      bool m_brake;							// whether the vehicles should break on emergency message
 
       /// Initializes the Highway and raises the event InitVehicle.
       void InitHighway();

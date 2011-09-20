@@ -62,7 +62,7 @@ namespace ns3
       static TypeId GetTypeId (void);
       /**
       * \param bwd the Vehicle in back. (current considered Vehicle)
-      * \param vwd the Vechile in front.
+      * \param vwd the Vehicle in front.
       * \returns the calculated acceleration for the considered Vehicle bwd based on the front Vehicle vwd and IDM rules.
 	  *
 	  * see: http://www.vwi.tu-dresden.de/~treiber/MicroApplet/IDM.html . 
