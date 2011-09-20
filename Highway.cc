@@ -233,12 +233,6 @@ namespace ns3
 				if(temp->IsEquipped ==true)
 				{
                 temp->SetReceiveCallback(m_receiveData);
-                temp->SetDevTxTraceCallback(m_devTxTrace);
-                temp->SetDevRxTraceCallback(m_devRxTrace);
-                temp->SetPhyRxOkTraceCallback(m_phyRxOkTrace);
-                temp->SetPhyRxErrorTraceCallback(m_phyRxErrorTrace);
-                temp->SetPhyTxTraceCallback(m_phyTxTrace);
-                temp->SetPhyStateTraceCallback(m_phyStateTrace);
 				}
                 m_vehicles[m_currentLaneDirPos].push_back(temp);
               }
@@ -269,12 +263,6 @@ namespace ns3
 				if(temp->IsEquipped ==true)
 				{
                 temp->SetReceiveCallback(m_receiveData);
-                temp->SetDevTxTraceCallback(m_devTxTrace);
-                temp->SetDevRxTraceCallback(m_devRxTrace);
-                temp->SetPhyRxOkTraceCallback(m_phyRxOkTrace);
-                temp->SetPhyRxErrorTraceCallback(m_phyRxErrorTrace);
-                temp->SetPhyTxTraceCallback(m_phyTxTrace);
-                temp->SetPhyStateTraceCallback(m_phyStateTrace);
 				}
                 m_vehicles[m_currentLaneDirPos].push_back(temp);
 		      }
@@ -326,12 +314,6 @@ namespace ns3
 				if(temp->IsEquipped == true)
 				{
                 temp->SetReceiveCallback(m_receiveData);
-                temp->SetDevTxTraceCallback(m_devTxTrace);
-                temp->SetDevRxTraceCallback(m_devRxTrace);
-                temp->SetPhyRxOkTraceCallback(m_phyRxOkTrace);
-                temp->SetPhyRxErrorTraceCallback(m_phyRxErrorTrace);
-                temp->SetPhyTxTraceCallback(m_phyTxTrace);
-                temp->SetPhyStateTraceCallback(m_phyStateTrace);
 				}
                 m_vehiclesOpp[m_currentLaneDirNeg].push_back(temp);
               }
@@ -362,12 +344,6 @@ namespace ns3
 				if(temp->IsEquipped == true)
 				{
                 temp->SetReceiveCallback(m_receiveData);
-                temp->SetDevTxTraceCallback(m_devTxTrace);
-                temp->SetDevRxTraceCallback(m_devRxTrace);
-                temp->SetPhyRxOkTraceCallback(m_phyRxOkTrace);
-                temp->SetPhyRxErrorTraceCallback(m_phyRxErrorTrace);
-                temp->SetPhyTxTraceCallback(m_phyTxTrace);
-                temp->SetPhyStateTraceCallback(m_phyStateTrace);
 				}
                 m_vehiclesOpp[m_currentLaneDirNeg].push_back(temp);
 		      }
@@ -1002,66 +978,6 @@ namespace ns3
   void Highway::SetReceiveDataCallback(Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> receiveData)
   {
     m_receiveData = receiveData;
-  }
-
-  DeviceTraceCallback Highway::GetDevTxTraceCallback()
-  {
-    return m_devTxTrace;
-  }
-
-  void Highway::SetDevTxTraceCallback(DeviceTraceCallback devTxTrace)
-  {
-    m_devTxTrace = devTxTrace;
-  }
-
-  DeviceTraceCallback Highway::GetDevRxTraceCallback()
-  {
-    return m_devRxTrace;
-  }
-  
-  void Highway::SetDevRxTraceCallback(DeviceTraceCallback devRxTrace)
-  {
-    m_devRxTrace = devRxTrace;
-  }
-
-  PhyRxOkTraceCallback Highway::GetPhyRxOkTraceCallback()
-  {
-    return m_phyRxOkTrace;
-  }
-
-  void Highway::SetPhyRxOkTraceCallback(PhyRxOkTraceCallback phyRxOkTrace)
-  {
-    m_phyRxOkTrace = phyRxOkTrace;
-  }
-
-  PhyRxErrorTraceCallback Highway::GetPhyRxErrorTraceCallback()
-  {
-    return m_phyRxErrorTrace; 
-  }
-
-  void Highway::SetPhyRxErrorTraceCallback(PhyRxErrorTraceCallback phyRxErrorTrace)
-  {
-    m_phyRxErrorTrace = phyRxErrorTrace;
-  }
-
-  PhyTxTraceCallback Highway::GetPhyTxTraceCallback()
-  {
-    return m_phyTxTrace;
-  }
-
-  void Highway::SetPhyTxTraceCallback(PhyTxTraceCallback phyTxTrace)
-  {
-    m_phyTxTrace = phyTxTrace;
-  }
-
-  PhyStateTraceCallback Highway::GetPhyStateTraceCallback()
-  {
-    return m_phyStateTrace;
-  }
-
-  void Highway::SetPhyStateTraceCallback(PhyStateTraceCallback phyStateTrace)
-  {
-    m_phyStateTrace = phyStateTrace;
   }
 
   Callback<bool, Ptr<Highway> ,Ptr<Vehicle> , double> Highway::GetControlVehicleCallback()

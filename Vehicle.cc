@@ -61,26 +61,6 @@ namespace ns3
     NetDeviceContainer d;
 	NodeContainer n(m_node);
     d = wifi.Install(phy, mac, n);
-    
-//    std::ostringstream oss;
-
-//    oss << "/NodeList/" << m_node->GetId()<< "/DeviceList/0/Mac/MacTx";
-//    Config::Connect (oss.str(), MakeCallback (&Vehicle::DevTxTrace, this));
-//    oss.str("");
-//    oss << "/NodeList/" << m_node->GetId()<< "/DeviceList/0/Mac/MacRx";
-//    Config::Connect (oss.str(), MakeCallback (&Vehicle::DevRxTrace, this));
-//    oss.str("");
-//    oss << "/NodeList/" << m_node->GetId()<< "/DeviceList/0/Phy/State/RxOk";
-//    Config::Connect (oss.str(), MakeCallback (&Vehicle::PhyRxOkTrace, this));
-//    oss.str("");
-//    oss << "/NodeList/" << m_node->GetId()<< "/DeviceList/0/Phy/State/RxError";
-//    Config::Connect (oss.str(), MakeCallback (&Vehicle::PhyRxErrorTrace, this));
-//    oss.str("");
-//    oss << "/NodeList/" << m_node->GetId()<< "/DeviceList/0/Phy/State/Tx";
-//    Config::Connect (oss.str(), MakeCallback (&Vehicle::PhyTxTrace, this));
-//    oss.str("");
-//    oss << "/NodeList/" << m_node->GetId()<< "/DeviceList/0/Phy/State/State";
-//    Config::Connect (oss.str(), MakeCallback (&Vehicle::PhyStateTrace, this));
 
     m_device = d.Get(0);
     m_device->SetReceiveCallback(MakeCallback(&Vehicle::ReceivePacket, this));
@@ -250,42 +230,6 @@ namespace ns3
       }
   }
 
-//  void Vehicle::DevTxTrace (std::string context, Ptr<const Packet> p)
-//  {
-//    if(!m_devTxTrace.IsNull())
-//	  m_devTxTrace(Ptr<Vehicle>(this), context, p);
-//  }
-//
-//  void Vehicle::DevRxTrace (std::string context, Ptr<const Packet> p)
-//  {
-//    if(!m_devRxTrace.IsNull())
-//	  m_devRxTrace(Ptr<Vehicle>(this), context, p);
-//  }
-//
-//  void Vehicle::PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
-//  {
-//    if(!m_phyRxOkTrace.IsNull())
-//      m_phyRxOkTrace(Ptr<Vehicle>(this), context, packet, snr, mode, preamble);
-//  }
-//
-//  void Vehicle::PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr)
-//  {
-//    if(!m_phyRxErrorTrace.IsNull())
-//	  m_phyRxErrorTrace(Ptr<Vehicle>(this), context, packet, snr);
-//  }
-//
-//  void Vehicle::PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower)
-//  {
-//    if(!m_phyTxTrace.IsNull())
-//	  m_phyTxTrace(Ptr<Vehicle>(this), context, packet, mode, preamble, txPower);
-//  }
-//
-//  void Vehicle::PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::State state)
-//  {
-//    if(!m_phyStateTrace.IsNull())
-//	  m_phyStateTrace(Ptr<Vehicle>(this), context, start, duration, state);
-//  }
-
   bool Vehicle::ReceivePacket(Ptr<NetDevice> device, Ptr<const Packet> packet,uint16_t protocol,const Address& address)
   {
     if(!m_receive.IsNull()) 
@@ -357,64 +301,4 @@ namespace ns3
   {
     m_receive = receive;
   }
-
-//  DeviceTraceCallback Vehicle::GetDevTxTraceCallback()
-//  {
-//    return m_devTxTrace;
-//  }
-//
-//  void Vehicle::SetDevTxTraceCallback(DeviceTraceCallback devTxTrace)
-//  {
-//    m_devTxTrace = devTxTrace;
-//  }
-//
-//  DeviceTraceCallback Vehicle::GetDevRxTraceCallback()
-//  {
-//    return m_devRxTrace;
-//  }
-//
-//  void Vehicle::SetDevRxTraceCallback(DeviceTraceCallback devRxTrace)
-//  {
-//    m_devRxTrace = devRxTrace;
-//  }
-//
-//  PhyRxOkTraceCallback Vehicle::GetPhyRxOkTraceCallback()
-//  {
-//    return m_phyRxOkTrace;
-//  }
-//
-//  void Vehicle::SetPhyRxOkTraceCallback(PhyRxOkTraceCallback phyRxOkTrace)
-//  {
-//    m_phyRxOkTrace = phyRxOkTrace;
-//  }
-//
-//  PhyRxErrorTraceCallback Vehicle::GetPhyRxErrorTraceCallback()
-//  {
-//    return m_phyRxErrorTrace;
-//  }
-//
-//  void Vehicle::SetPhyRxErrorTraceCallback(PhyRxErrorTraceCallback phyRxErrorTrace)
-//  {
-//    m_phyRxErrorTrace = phyRxErrorTrace;
-//  }
-//
-//  PhyTxTraceCallback Vehicle::GetPhyTxTraceCallback()
-//  {
-//    return m_phyTxTrace;
-//  }
-//
-//  void Vehicle::SetPhyTxTraceCallback(PhyTxTraceCallback phyTxTrace)
-//  {
-//    m_phyTxTrace = phyTxTrace;
-//  }
-//
-//  PhyStateTraceCallback Vehicle::GetPhyStateTraceCallback()
-//  {
-//    return m_phyStateTrace;
-//  }
-//
-//  void Vehicle::SetPhyStateTraceCallback(PhyStateTraceCallback phyStateTrace)
-//  {
-//    m_phyStateTrace = phyStateTrace;
-//  }
 }

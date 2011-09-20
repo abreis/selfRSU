@@ -44,17 +44,7 @@ namespace ns3
   
   /// define type VehicleReceiveCallback.
   typedef Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> VehicleReceiveCallback; 
-  /// define type DeviceTraceCallback
-  typedef Callback<void, Ptr<Vehicle>, std::string, Ptr<const Packet> > DeviceTraceCallback; 
-  /// define type PhyRxOkTraceCallback.
-  typedef Callback<void, Ptr<Vehicle>, std::string, Ptr<const Packet>, double, WifiMode, enum WifiPreamble> PhyRxOkTraceCallback; 
-  /// define type PhyRxErrorTraceCallback.
-  typedef Callback<void, Ptr<Vehicle>, std::string, Ptr<const Packet>, double> PhyRxErrorTraceCallback; 
-  /// define type PhyTxTraceCallback.
-  typedef Callback<void, Ptr<Vehicle>, std::string, Ptr<const Packet>, WifiMode, WifiPreamble, uint8_t> PhyTxTraceCallback; 
-  /// define type PhyStateTraceCallback.
-  typedef Callback<void, Ptr<Vehicle>, std::string, Time, Time, enum WifiPhy::State> PhyStateTraceCallback;
-  
+
   /**
   * \brief Vehicle is a mobile Object which follows the given IDM/MOBIL mobility Model and LaneChange rules.
   *
@@ -89,18 +79,6 @@ namespace ns3
 
 	  /// Catching an event when a packet is received.
       VehicleReceiveCallback m_receive;
-      /// Catching DevTxTrace.
-      DeviceTraceCallback m_devTxTrace;
-      /// Catching DevRxTrace.
-      DeviceTraceCallback m_devRxTrace;
-      /// Catching PhyRxOkTrace.
-      PhyRxOkTraceCallback m_phyRxOkTrace;
-      /// Catching PhyRxErrorTrace.
-      PhyRxErrorTraceCallback m_phyRxErrorTrace;
-      /// Catching PhyTxTrace.
-      PhyTxTraceCallback m_phyTxTrace;
-      /// Catching PhyStateTrace.
-      PhyStateTraceCallback m_phyStateTrace;
     		
     public:
 
@@ -296,30 +274,6 @@ namespace ns3
       VehicleReceiveCallback GetReceiveCallback();
       /// sets the Vehicle's receive callback which is being used to handle the receive data event.
       void SetReceiveCallback(VehicleReceiveCallback receive);
-      /// returns the Vehicle's DevTxTrace callback.
-      DeviceTraceCallback GetDevTxTraceCallback();
-      /// sets the Vehicle's DevTxTrace callback.
-      void SetDevTxTraceCallback(DeviceTraceCallback devTxTrace);
-      /// returns the Vehicle's DevRxTrace callback.
-      DeviceTraceCallback GetDevRxTraceCallback();
-      /// sets the Vehicle's DevRxTrace callback.
-      void SetDevRxTraceCallback(DeviceTraceCallback devRxTrace);
-      /// returns the Vehicle's PhyRxOkTrace callback.
-      PhyRxOkTraceCallback GetPhyRxOkTraceCallback();
-      /// sets the Vehicle's PhyRxOkTrace callback.
-      void SetPhyRxOkTraceCallback(PhyRxOkTraceCallback phyRxOkTrace);
-      /// returns the Vehicle's PhyRxErrorTrace callback.
-      PhyRxErrorTraceCallback GetPhyRxErrorTraceCallback();
-      /// sets the Vehicle's PhyRxErrorTrace callback.
-      void SetPhyRxErrorTraceCallback(PhyRxErrorTraceCallback phyRxErrorTrace);
-      /// returns the Vehicle's PhyTxTrace callback.
-      PhyTxTraceCallback GetPhyTxTraceCallback();
-      /// sets the Vehicle's PhyTxTrace callback.
-      void SetPhyTxTraceCallback(PhyTxTraceCallback phyTxTrace);
-      /// returns the Vehicle's PhyStateTrace callback.
-      PhyStateTraceCallback GetPhyStateTraceCallback();
-      /// sets the Vehicle's PhyStateTrace callback.
-      void SetPhyStateTraceCallback(PhyStateTraceCallback phyStateTrace);
 	  /// used for purpose of considering market penetration rate.
 	  bool IsEquipped;  
 

@@ -125,18 +125,6 @@ namespace ns3
       Callback<bool, Ptr<Highway>, int&> m_initVehicle;
       /// For Catching an event when a packet is received by any vehicles in the Highway.
       VehicleReceiveCallback m_receiveData;
-      /// For Catching DevTxTrace.
-      DeviceTraceCallback m_devTxTrace;
-      /// For Catching DevRxTrace.
-      DeviceTraceCallback m_devRxTrace;
-      /// For Catching PhyRxOkTrace.
-      PhyRxOkTraceCallback m_phyRxOkTrace;
-      /// For Catching PhyRxErrorTrace.
-      PhyRxErrorTraceCallback m_phyRxErrorTrace;
-      /// For Catching PhyTxTrace.
-      PhyTxTraceCallback m_phyTxTrace;
-      /// For Catching PhyStateTrace.
-      PhyStateTraceCallback m_phyStateTrace;
 
     public: 
 
@@ -395,30 +383,6 @@ namespace ns3
       VehicleReceiveCallback GetReceiveDataCallback();
       /// Sets the Highway's Receive Data callback.
       void SetReceiveDataCallback(VehicleReceiveCallback receiveData);
-      /// Returns the Highway's DevTxTrace callback.
-      DeviceTraceCallback GetDevTxTraceCallback();
-      /// Sets the Highway's DevTxTrace callback.
-      void SetDevTxTraceCallback(DeviceTraceCallback devTxTrace);
-      /// Returns the Highway's DevRxTrace callback.
-      DeviceTraceCallback GetDevRxTraceCallback();
-      /// Sets the Highway's DevRxTrace callback.
-      void SetDevRxTraceCallback(DeviceTraceCallback devRxTrace);
-      /// Returns the Highway's PhyRxOkTrace callback.
-      PhyRxOkTraceCallback GetPhyRxOkTraceCallback();
-      /// Sets the Highway's PhyRxOkTrace callback.
-      void SetPhyRxOkTraceCallback(PhyRxOkTraceCallback phyRxOkTrace);
-      /// Returns the Highway's PhyRxErrorTrace callback.
-      PhyRxErrorTraceCallback GetPhyRxErrorTraceCallback();
-      /// Sets the Highway's PhyRxErrorTrace callback.
-      void SetPhyRxErrorTraceCallback(PhyRxErrorTraceCallback phyRxErrorTrace);
-      /// Returns the Highway's PhyTxTrace callbacl.
-      PhyTxTraceCallback GetPhyTxTraceCallback();
-      /// Sets the Highway's PhyTxTrace callback.
-      void SetPhyTxTraceCallback(PhyTxTraceCallback phyTxTrace);
-      /// Returns the Highway's PhyStateTrace callback.
-      PhyStateTraceCallback GetPhyStateTraceCallback();
-      /// Sets the Highway's PhyStateTrace callback.
-      void SetPhyStateTraceCallback(PhyStateTraceCallback phyStateTrace);
       /// Returns the Highway Control Vehicle callback. 
       Callback<bool, Ptr<Highway> ,Ptr<Vehicle> , double> GetControlVehicleCallback();
       /// Sets the Highway Control Vehicle callback.
