@@ -67,6 +67,27 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	 * Called when the simulator initiates
 	 */
 
+	// Vehicle lanes start with 0 ( [0,m_numberOfLanes[ )
+	// Vehicle direction: 1 (normal), -1 (opposite)
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/*
+	 * Return true: a signal to highway that the lane lists (queues) in where obstacles and vehicles are being added
+	 * must be sorted based on their positions.
+	 * Return false: to ignore sorting.
+	 * ! Do not return false when vehicles are manually added to the highway.
+	 */
 	return true;
 }
 
@@ -76,7 +97,11 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	 * This is invoked every deltaT, for each vehicle in the road
 	 */
 
-	return true;
+
+
+
+	// return false: a signal to highway that lets the vehicle automatically be handled (using IDM/MOBIL rules)
+	return false;
 }
 
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address)
@@ -92,7 +117,7 @@ int main (int argc, char *argv[])
 
 	// Default values
 	float simTime=1000.0;				// simulation time
-	bool twoDirectional=false;			// one or two directional
+	bool twoDirectional=true;			// one or two directional
 	double flow1=0.0039, flow2=0.0039;	// traffic flow mean at entrance (veh/m)
 	double vel1=30, vel2=30;			// traffic velocity mean at entrance
 	int numberOfLanes=3;				// number of lanes (per direction)
@@ -101,7 +126,7 @@ int main (int argc, char *argv[])
 	// unused:
 	double pRate=100;					// penetration rate of equipped vehicles
 	double mix=100;						// car to truck injection mix percentage
-	double gap=5;						// injection gap at entrance
+	double gap=2;						// injection gap at entrance (min 2)
 //	double speedLimit=30;				// speed limit
 //	double speedStd=0;					// speed std
 	double transmissionPower=21.5;		// transmission power (250-300 meter transmission range)

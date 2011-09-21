@@ -78,7 +78,7 @@ namespace ns3
   Ptr<Model> Highway::CreateSedanModel()
   {
     Ptr<Model> model = CreateObject<Model>();
-    model->SetDesiredVelocity(25.0);
+    model->SetDesiredVelocity(30.0);
     model->SetDeltaV(4.0);
     model->SetAcceleration(0.5);  
     model->SetDeceleration(3.0);  
@@ -357,7 +357,7 @@ namespace ns3
   {
     if(m_stopped==true) return;
     static int loop=0;
-    // NOTE: ORDER OF CALLING THIS FUNCTIONS IS VERY VERY IMPORTANT (EFFECT OF CURRENT SPEED, POSITION, DECICION)
+    // NOTE: ORDER OF CALLING THESE FUNCTIONS IS VERY IMPORTANT (EFFECT OF CURRENT SPEED, POSITION, DECISION)
     if(loop==10) loop=0;
     if(loop==0 && m_changeLaneSet==true) 
       {
@@ -389,10 +389,10 @@ namespace ns3
         for (unsigned int j = 0; j < vehicles[i].size(); j++)
           {
             Ptr<Vehicle> veh=GetVehicle(vehicles[i],j);
-            bool controled=false;
+            bool controlled=false;
             if(!m_controlVehicle.IsNull()) 
-		      controled=m_controlVehicle(Ptr<Highway>(this), veh, dt);
-            if(controled==false)
+            	controlled=m_controlVehicle(Ptr<Highway>(this), veh, dt);
+            if(controlled==false)
               {
                 if (j == 0)
                   {
@@ -570,7 +570,7 @@ namespace ns3
     m_wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211a);
     m_wifiMacHelper = NqosWifiMacHelper::Default();
     m_wifiPhyHelper = YansWifiPhyHelper::Default();
-    m_wifiChannelHelper = YansWifiChannelHelper::Default ();
+    m_wifiChannelHelper = YansWifiChannelHelper::Default();
     m_wifiMacHelper.SetType ("ns3::AdhocWifiMac");
     m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("wifia-6mbs"));
     //m_wifiChannelHelper.AddPropagationLoss ("ns3::NakagamiPropagationLossModel");
@@ -699,7 +699,7 @@ namespace ns3
 
   void Highway::PrintVehicles()
   {
-    std::cout << "Lane 2----------------" << Simulator::Now()<< "--------" << std::endl;
+    std::cout << "Lane -----------------" << Simulator::Now()<< "--------" << std::endl;
     for(unsigned int i=0; i<m_vehicles[1].size();i++)
       {
         Ptr<Vehicle> v=GetVehicle(m_vehicles[1],i);
@@ -970,12 +970,12 @@ namespace ns3
     m_receiveData = receiveData;
   }
 
-  Callback<bool, Ptr<Highway> ,Ptr<Vehicle> , double> Highway::GetControlVehicleCallback()
+  Callback<bool, Ptr<Highway>, Ptr<Vehicle>, double> Highway::GetControlVehicleCallback()
   {
     return m_controlVehicle;
   }
 
-  void Highway::SetControlVehicleCallback(Callback<bool, Ptr<Highway> ,Ptr<Vehicle> , double> controlVehicle)
+  void Highway::SetControlVehicleCallback(Callback<bool, Ptr<Highway>, Ptr<Vehicle>, double> controlVehicle)
   {
     m_controlVehicle = controlVehicle;
   }
