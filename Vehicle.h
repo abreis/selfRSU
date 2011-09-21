@@ -69,12 +69,12 @@ namespace ns3
       double m_velocity;            // vehicle's velocity.
       double m_acceleration;        // vehicle's acceleration.
       int m_direction;              // vehicle's direction.
-      bool m_brake;
       Ptr<Model> m_model;           // vehicle's IDM mobility model.
-      Ptr<LaneChange> m_laneChange; // vehicle's IDM/MOBILE lanechange Model.
+      Ptr<LaneChange> m_laneChange; // vehicle's IDM/MOBIL lanechange Model.
       int m_vehicleId;              // vehicle's id
       Ptr<Node> m_node;             // vehicle has a node
       Ptr<NetDevice> m_device;      // vehicle has a device
+      bool m_brake;					// vehicle's braking status.
       list<unsigned int> p_buffer;	// packet storage
 
 	  /// Catching an event when a packet is received.
@@ -188,7 +188,7 @@ namespace ns3
       */
       bool GetBrake();
       /**
-      * \returns the direction of the Vehicle in verbose 'W' (1) or 'E' (-1).
+      * \returns the direction of the Vehicle in verbose 'E' (1) or 'W' (-1).
       */
       char GetCharDirection();
       /**
@@ -220,7 +220,7 @@ namespace ns3
       /**
       * \param dt the interval dt. [passed time or time to pass].
       *
-      * Tranlates the Vehicle to the next velocity(speed) by knowing intercal dt, velocity, and acceleration.
+      * Translates the Vehicle to the next velocity(speed) by knowing interval dt, velocity, and acceleration.
       * Velocity += Acceleration * dt.
       */
       virtual void TranslateVelocity(double dt);
@@ -259,15 +259,11 @@ namespace ns3
       * \param packet the packet to send.
       * \returns ture if the enqueuing/sending was successful, otherwise false.
       */
+      bool SendTo(Address address, Ptr<Packet> packet);
 
       list<unsigned int> GetPacketList();
       void AddPacket(unsigned int pID);
-      void SetSilence(bool silent);
-      bool GetSilence(void);
-      void SetRSU(bool rsu);
-      bool GetRSU(void);
 
-      bool SendTo(Address address, Ptr<Packet> packet);
       /// is used for purpose of sorting vehicles based on their positions in a list or a queue.
       static bool Compare(Ptr<Vehicle> v1, Ptr<Vehicle> v2);
       /// returns the vehicle's receive callback.
@@ -280,18 +276,7 @@ namespace ns3
     protected:
       /// ReceiverPacket handler. This is the handler which catches the Vehicle's Receive Data event.
       bool ReceivePacket(Ptr<NetDevice> device,Ptr<const Packet> packet,uint16_t protocol,const Address& address);
-      /// DevTxTrace handler.
-      void DevTxTrace (std::string context, Ptr<const Packet> p);
-      /// DevRxTrace handler.
-      void DevRxTrace (std::string context, Ptr<const Packet> p);
-      /// PhyRxOkTrace handler.
-      void PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble);
-      /// PhyRxErrorTrace handler.
-      void PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr);
-      /// PhyTxTrace handler.
-      void PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower);
-      /// PhyStateTrace handler.
-      void PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::State state);
+
   };
 };
 #endif

@@ -45,7 +45,7 @@ namespace ns3
       }
     else
       {
-        double delta_v = bwd->GetVelocity() - 25.0;
+        double delta_v = bwd->GetVelocity() - 30.0;		// TODO: was 25.0
         double s = 500;
         double vel = bwd->GetVelocity();
         double s_star_raw = m_minimumGap + vel * m_timeHeadway + (vel * delta_v) / (2 * m_sqrtAccDec);

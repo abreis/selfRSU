@@ -47,8 +47,6 @@ namespace ns3
     m_width = 0;
 	IsEquipped=true;
 	is_alive=true;
-	is_rsu=false;
-	is_silent=false;
   }
 
   Vehicle::~Vehicle()
@@ -265,26 +263,6 @@ namespace ns3
   void Vehicle::AddPacket(unsigned int pID)
   {
     p_buffer.push_back(pID);
-  }
-
-  void Vehicle::SetSilence(bool silent)
-  {
-    is_silent=silent;
-  }
-
-  bool Vehicle::GetSilence(void)
-  {
-    return is_silent;
-  }
-
-  void Vehicle::SetRSU(bool rsu)
-  {
-    is_rsu=rsu;
-  }
-
-  bool Vehicle::GetRSU(void)
-  {
-    return is_rsu;
   }
 
   bool Vehicle::SendTo(Address address, Ptr<Packet> packet)
