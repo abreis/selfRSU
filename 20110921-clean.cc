@@ -47,15 +47,9 @@ NS_LOG_COMPONENT_DEFINE ("HADI");
 using namespace ns3;
 using namespace std;
 
-static Ptr<Vehicle> CreateVehicle(Ptr<Highway> highway, int lane, int direction);
-static Ptr<Vehicle> CreateObstacle(Ptr<Highway> highway, int lane, int direction, int position);
-static void AddPacket(Ptr<Vehicle> veh, unsigned int pID);
-static void AddVehicle(Ptr<Highway> highway, Ptr<Vehicle> veh);
 static bool InitVehicle(Ptr<Highway> highway, int& VID);
 static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt);
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address);
-static void ReBroadcastMessage(Ptr<Vehicle> vehicle, unsigned int pID);
-static void ExponentialAddVehicles(Ptr<Highway> highway, int lane, int direction);
 
 static void Start(Ptr<Highway> highway)
 {
@@ -67,41 +61,10 @@ static void Stop(Ptr<Highway> highway)
   highway->Stop();
 }
 
-
-static Ptr<Vehicle> CreateVehicle(Ptr<Highway> highway, int lane, int direction)
-{
-
-	return vhc;
-}
-
-static Ptr<Vehicle> CreateObstacle(Ptr<Highway> highway, int lane, int direction, int position)
-{
-	/*
-	 * An obstacle is a vehicle with zero speed. In the future, initiate it with an error message broadcast.
-	 */
-
-	return vhc;
-}
-
-static void AddPacket(Ptr<Vehicle> veh, unsigned int pID)
-{
-
-}
-
-static void AddVehicle(Ptr<Highway> highway, Ptr<Vehicle> veh)
-{
-
-}
-
 static bool InitVehicle(Ptr<Highway> highway, int& VID)
 {
 	/*
 	 * Called when the simulator initiates
-	 */
-	/*
-	 * > Schedule obstacle introduction
-	 * > Schedule Dst vehicle introduction
-	 * > Enable exponential vehicle generation
 	 */
 
 	return true;
@@ -113,7 +76,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	 * This is invoked every deltaT, for each vehicle in the road
 	 */
 
-	return true;	// TODO Return false to have mobility model act?
+	return true;
 }
 
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address)
@@ -121,44 +84,32 @@ static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address addr
 
 }
 
-static void ReBroadcastMessage(Ptr<Vehicle> vehicle, unsigned int pID)
-{
-
-}
-
-static void ExponentialAddVehicles(Ptr<Highway> highway, int lane, int direction)
-{
-
-}
-
-
 int main (int argc, char *argv[])
 { 
 	ns3::PacketMetadata::Enable();
 	Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("2200"));
 	Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("2200"));
 
-	float simTime=1.0;					// simulation time
+	// Default values
+	float simTime=1000.0;				// simulation time
 	bool twoDirectional=false;			// one or two directional
-	double flow1=0.0039, flow2=0.0039;	// traffic flow mean at entrance
+	double flow1=0.0039, flow2=0.0039;	// traffic flow mean at entrance (veh/m)
 	double vel1=30, vel2=30;			// traffic velocity mean at entrance
 	int numberOfLanes=3;				// number of lanes (per direction)
 	bool laneChange=true;				// lane change
 	int runNumber=1;					// run number
-
 	// unused:
-	bool plot=false;					// generate output fot gnuplot
 	double pRate=100;					// penetration rate of equipped vehicles
 	double mix=100;						// car to truck injection mix percentage
 	double gap=5;						// injection gap at entrance
-	double speedLimit=30;				// speed limit
-	double speedStd=0;					// speed std
+//	double speedLimit=30;				// speed limit
+//	double speedStd=0;					// speed std
+	double transmissionPower=21.5;		// transmission power (250-300 meter transmission range)
+	double deltaT=0.1;					// simulation step
 	string directory="./";				//
 	string fp="";						// prefix for filenames
-	int distribution=1;					// 0 = Uniform, 1 = Exponential, 2 = Normal, 3 = Log Normal, default = 0
-	double std1=0.0, std2=0.0;			// traffic flow std at entrance
-	double maxFlow=5.0;					// traffic maximum flow/lane at entrance (both directions)
-	double transmissionPower=21.5;		// transmission power
+	directory+=fp;
+	fp=directory;
 
 	// Process command-line args
 	CommandLine cmd;
@@ -173,6 +124,54 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("rn", "run number", runNumber);
 	cmd.Parse(argc, argv);
 
+	// Build an exponential variable (unit: seconds per vehicle), and an upper bound 5 times higher to prevent flukes
+	RandomVariable RV1 = ExponentialVariable(1/(flow1*vel1), 5/(flow1*vel1));	// mean, upperbound
+	RandomVariable RV2 = ExponentialVariable(1/(flow2*vel2), 5/(flow2*vel2));	// mean, upperbound
+
+	// Create and setup a highway
+	Ptr<Highway> highway=CreateObject<Highway>();
+	highway->SetHighwayLength(10000);
+	highway->SetTwoDirectional(twoDirectional);
+	highway->SetFlowPositiveDirection(flow1);
+	highway->SetFlowNegativeDirection(flow2);
+	highway->SetVelocityPositiveDirection(vel1);
+	highway->SetVelocityNegativeDirection(vel2);
+	highway->SetNumberOfLanes(numberOfLanes);
+	highway->SetChangeLane(laneChange);
+	highway->SetFlowRVPositiveDirection(RV1);
+	highway->SetFlowRVNegativeDirection(RV2);
+	// unused:
+//	highway->SetSpeedRV(RVSpeed);
+	highway->SetLaneWidth(5);
+	highway->SetMedianGap(5);
+	highway->SetInjectionGap(gap);
+	highway->SetInjectionMixValue(mix);
+	highway->SetAutoInject(false);
+	highway->SetPenetrationRate(pRate);
+	highway->SetDeltaT(deltaT);
+
+	// Update the transmission range of wifi shared in the Highway
+	YansWifiPhyHelper tempHelper = highway->GetYansWifiPhyHelper();
+	tempHelper.Set("TxPowerStart",DoubleValue(transmissionPower));
+	tempHelper.Set("TxPowerEnd",DoubleValue(transmissionPower));	// up this for yans::sendPacket()
+	highway->SetYansWifiPhyHelper(tempHelper);
+
+	// Bind the Highway/Vehicle events to the event handlers
+	highway->SetControlVehicleCallback(MakeCallback(&ControlVehicle));
+	highway->SetInitVehicleCallback(MakeCallback(&InitVehicle));
+	highway->SetReceiveDataCallback(MakeCallback(&ReceiveData));
+
+	// Setup seed and run-number (to affect random variable outcome of different runs)
+	if(runNumber < 1) runNumber=1;
+	SeedManager::SetSeed(1);
+	SeedManager::SetRun(runNumber);
+
+	// Schedule and run highway
+	Simulator::Schedule(Seconds(0.0), &Start, highway);		// Invokes Start(Highway)
+	Simulator::Schedule(Seconds(simTime), &Stop, highway);
+	Simulator::Stop(Seconds(simTime));
+	Simulator::Run();
+	Simulator::Destroy();
 
 	return 0;
 }
