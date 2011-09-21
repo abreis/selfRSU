@@ -12,9 +12,9 @@ def build(bld):
 #	'LaneChange.cc',
 #	]
 
-    obj = bld.create_ns3_program('20110920-review', ['core'])
+    obj = bld.create_ns3_program('20110921-clean', ['core'])
     obj.source = [
-	'20110920-review.cc',
+	'20110921-clean.cc',
 	'Highway.cc',
 	'Vehicle.cc',
 	'Model.cc',

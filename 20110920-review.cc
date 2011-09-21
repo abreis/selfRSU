@@ -146,7 +146,7 @@ static void AddPacket(Ptr<Vehicle> veh, unsigned int pID)
 static void AddVehicle(Ptr<Highway> highway, Ptr<Vehicle> veh)
 {
 	ns3::Time nowtime = ns3::Simulator::Now();
-    highway->AddVehicle(veh);
+	highway->AddVehicle(veh);
 	cout << "LOG " << nowtime.ns3::Time::GetSeconds() << " V " << veh->GetVehicleId() << ' ' <<  veh->GetPosition().x << ' ' << veh->GetCharDirection() << '\n';
 }
 

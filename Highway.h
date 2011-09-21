@@ -322,9 +322,7 @@ namespace ns3
 	  */
 	  void SetSpeedRV(RandomVariable rv);
 
-	  void SetTrafficLanes(int value);
 	  void SetBrake(bool value);
-	  int GetTrafficLanes();
 	  bool GetBrake();
 
 	  /**
@@ -344,7 +342,7 @@ namespace ns3
 	  */
       WifiHelper GetWifiHelper();
 	  /**
-	  * \returns the NqosWifiMacHelepr used by the Highway.
+	  * \returns the NqosWifiMacHelper used by the Highway.
 	  */
       NqosWifiMacHelper GetNqosWifiMacHelper();
 	  /**
