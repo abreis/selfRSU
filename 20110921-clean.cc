@@ -78,6 +78,7 @@ static void AddVehicle(Ptr<Highway> highway, int& VID, int direction)
 	temp->SetPosition(Vector( (direction==1)?(-4):(highway->GetHighwayLength()+4) , highway->GetYForLane(0,direction), 0));
     temp->SetLane(0);
     temp->SetVelocity(velocity);
+    temp->SetManualControl(false);
     temp->SetAcceleration(0.0);
 	Ptr<Model> tempModel=highway->CreateSedanModel();
 	tempModel->SetDesiredVelocity(velocity);
@@ -143,9 +144,14 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	 * This is invoked every deltaT, for each vehicle in the road
 	 */
 
+	// Log vehicle positions
+	ns3::Time nowtime = ns3::Simulator::Now();
+	float NOW = nowtime.ns3::Time::GetSeconds();
 
-
-	// echo vehicle's positions
+	if((int)(NOW*10) % 10 == 0) // % f : frequency of updates (100->10sec, 10-> 1sec
+		cout << "LOG " << nowtime.ns3::Time::GetSeconds() << " C " << vehicle->GetVehicleId() << ' '
+			<<  vehicle->GetPosition().x << "\tVEL " << vehicle->GetVelocity() << "\tACC " << vehicle->GetAcceleration()
+			<< "\tLANE " << vehicle->GetLane() << '\n';
 
 
 
@@ -158,7 +164,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address)
 {
-
+	cout << "LOG " << "GOT A PACKET" << endl;
 }
 
 int main (int argc, char *argv[])
@@ -173,7 +179,7 @@ int main (int argc, char *argv[])
 	double flow1=0.0039, flow2=0.0039;	// traffic flow mean at entrance (veh/m)
 	double vel1=30, vel2=30;			// traffic velocity mean at entrance
 	int numberOfLanes=3;				// number of lanes (per direction)
-	bool laneChange=true;				// lane change
+	bool laneChange=false;				// lane change
 	int runNumber=1;					// run number
 	// unused:
 	double pRate=100;					// penetration rate of equipped vehicles

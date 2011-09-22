@@ -47,6 +47,7 @@ namespace ns3
     m_width = 0;
 	IsEquipped=true;
 	is_alive=true;
+	m_control=false;
   }
 
   Vehicle::~Vehicle()
