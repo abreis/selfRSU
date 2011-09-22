@@ -572,7 +572,7 @@ namespace ns3
     m_wifiPhyHelper = YansWifiPhyHelper::Default();
     m_wifiChannelHelper = YansWifiChannelHelper::Default();
     m_wifiMacHelper.SetType ("ns3::AdhocWifiMac");
-    m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("wifia-6mbs"));
+    m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("OfdmRate6Mbps"));
     //m_wifiChannelHelper.AddPropagationLoss ("ns3::NakagamiPropagationLossModel");
 	m_wifiChannel = m_wifiChannelHelper.Create();
     m_wifiPhyHelper.SetChannel (m_wifiChannel);
