@@ -51,7 +51,8 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID);
 static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt);
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address);
 // custom:
-static void AddVehicle(Ptr<Highway> highway);
+static void AddVehicle(Ptr<Highway> highway, int& VID, int direction);
+static void AddVehicle(Ptr<Highway> highway, int& VID, int direction, double velocity, double location , bool control);
 
 /* * * * * * */
 
@@ -65,41 +66,65 @@ static void Stop(Ptr<Highway> highway)
   highway->Stop();
 }
 
-static void AddVehicle(Ptr<Highway> highway)
+static void AddVehicle(Ptr<Highway> highway, int& VID, int direction)
+{
+    Ptr<Vehicle> temp=CreateObject<Vehicle>();
+    double velocity = (direction==1) ? highway->GetVelocityPositiveDirection() : highway->GetVelocityNegativeDirection();
+
+	temp->IsEquipped = true;
+	temp->SetupWifi(highway->GetWifiHelper(), highway->GetYansWifiPhyHelper(), highway->GetNqosWifiMacHelper());
+    temp->SetVehicleId(VID++);
+    temp->SetDirection(direction);
+	temp->SetPosition(Vector( (direction==1)?(-4):(highway->GetHighwayLength()+4) , highway->GetYForLane(0,direction), 0));
+    temp->SetLane(0);
+    temp->SetVelocity(velocity);
+    temp->SetAcceleration(0.0);
+	Ptr<Model> tempModel=highway->CreateSedanModel();
+	tempModel->SetDesiredVelocity(velocity);
+    temp->SetModel(tempModel);
+    temp->SetLaneChange(highway->GetSedanLaneChange());
+    temp->SetLength(4);
+    temp->SetWidth(2);
+    temp->SetReceiveCallback(highway->GetReceiveDataCallback());
+
+    highway->AddVehicle(temp);
+}
+
+static void AddVehicle(Ptr<Highway> highway, int& VID, int direction, double velocity, double location, bool control)
 {
     Ptr<Vehicle> temp=CreateObject<Vehicle>();
 
-    temp->IsEquipped = true;
-	temp->SetupWifi(highway->GetWifiHelper(), highway->GetYansWifiPhyHelper(), m_wifiMacHelper);
-    temp->SetVehicleId(m_vehicleId++);
-    temp->SetDirection(1);
-    temp->SetPosition(Vector(-4,GetYForLane(m_currentLaneDirPos,1),0));
-    temp->SetLane(m_currentLaneDirPos);
-    temp->SetVelocity(vel);
+	temp->IsEquipped = true;
+	temp->SetupWifi(highway->GetWifiHelper(), highway->GetYansWifiPhyHelper(), highway->GetNqosWifiMacHelper());
+    temp->SetVehicleId(VID++);
+    temp->SetDirection(direction);
+	temp->SetPosition(Vector(location , highway->GetYForLane(0,direction), 0));
+    temp->SetLane(0);
+    temp->SetVelocity(velocity);
+    temp->SetManualControl(control);
     temp->SetAcceleration(0.0);
-	Ptr<Model> tempModel=CreateSedanModel();
-	tempModel->SetDesiredVelocity(m_RVSpeed.GetValue());
+	Ptr<Model> tempModel=highway->CreateSedanModel();
+	tempModel->SetDesiredVelocity(velocity);
     temp->SetModel(tempModel);
-    temp->SetLaneChange(m_laneChangeSedan);
+    temp->SetLaneChange(highway->GetSedanLaneChange());
     temp->SetLength(4);
     temp->SetWidth(2);
-    temp->SetReceiveCallback(m_receiveData);
+    temp->SetReceiveCallback(highway->GetReceiveDataCallback());
 
-    // Push vehicle // TODO according to direction
-    m_vehicles[m_currentLaneDirPos].push_back(temp);
+    highway->AddVehicle(temp);
 }
 
 static bool InitVehicle(Ptr<Highway> highway, int& VID)
 {
 	/*
-	 * Called when the simulator initiates
+	 * Called when the simulator starts
 	 */
 
 	// Vehicle lanes start with 0 ( [0,m_numberOfLanes[ )
 	// Vehicle direction: 1 (normal), -1 (opposite)
 
-
-
+	AddVehicle(highway, VID, 1);
+	AddVehicle(highway, VID, 1, 0.0, 5000.0, true);
 
 
 
@@ -120,9 +145,15 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 
 
 
+	// echo vehicle's positions
+
+
 
 	// return false: a signal to highway that lets the vehicle automatically be handled (using IDM/MOBIL rules)
-	return false;
+	if(vehicle->GetManualControl())
+		return true;
+	else
+		return false;
 }
 
 static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address)

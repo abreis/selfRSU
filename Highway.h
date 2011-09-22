@@ -209,6 +209,14 @@ namespace ns3
 	  * \param value the traffic velocity m/s in negative direction at entrance. 
 	  */
 	  void SetVelocityNegativeDirection(double value);
+      /**
+      * \returns the traffic velocity m/s in positive direction at entrance.
+      */
+	  double GetVelocityPositiveDirection(void);
+      /**
+      * \returns the traffic velocity m/s in negative direction at entrance.
+      */
+	  double GetVelocityNegativeDirection(void);
 	  /**
       * \returns the Median Gap. (width of the median)
       */

@@ -255,6 +255,16 @@ namespace ns3
     return is_alive;
   }
 
+  bool Vehicle::GetManualControl()
+  {
+	  return m_control;
+  }
+
+  void Vehicle::SetManualControl(bool control)
+  {
+	  m_control = control;
+  }
+
   list<unsigned int> Vehicle::GetPacketList()
   {
     return p_buffer;

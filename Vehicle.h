@@ -75,6 +75,7 @@ namespace ns3
       Ptr<Node> m_node;             // vehicle has a node
       Ptr<NetDevice> m_device;      // vehicle has a device
       bool m_brake;					// vehicle's braking status.
+      bool m_control;				// vehicle is manually controlled
       list<unsigned int> p_buffer;	// packet storage
 
 	  /// Catching an event when a packet is received.
@@ -180,25 +181,25 @@ namespace ns3
       */
       void SetLane(int value);
       /**
-      * \returns the direction of the Vehicle.
-      */
-      int GetDirection();
-      /**
       * \returns the braking decision of the Vehicle.
       */
       bool GetBrake();
+      /**
+      * \param value whether the vehicle brakes [true/false]
+      */
+      void SetBrake(bool value);
       /**
       * \returns the direction of the Vehicle in verbose 'E' (1) or 'W' (-1).
       */
       char GetCharDirection();
       /**
+      * \returns the direction of the Vehicle.
+      */
+      int GetDirection();
+      /**
       * \param value the direction of the Vehicle. Usually (+1) or (-1) used in the Highway. 
       */
       void SetDirection(int value);
-      /**
-      * \param value whether the vehicle brakes [true/false]
-      */
-      void SetBrake(bool value);
       /**
       * \param vwd the Vehicle in front.
       *
@@ -260,6 +261,14 @@ namespace ns3
       * \returns ture if the enqueuing/sending was successful, otherwise false.
       */
       bool SendTo(Address address, Ptr<Packet> packet);
+      /**
+      * \returns vehicle is being controlled manually (true/false)
+      */
+      bool GetManualControl();
+      /**
+      * \param vehicle is being controlled manually (true/false)
+      */
+      void SetManualControl(bool control);
 
       list<unsigned int> GetPacketList();
       void AddPacket(unsigned int pID);

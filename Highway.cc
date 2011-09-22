@@ -764,6 +764,16 @@ namespace ns3
     if(value>=0) m_velocityDirNeg = value;
   }
 
+  double Highway::GetVelocityPositiveDirection(void)
+  {
+    return m_velocityDirPos;
+  }
+
+  double Highway::GetVelocityNegativeDirection(void)
+  {
+    return m_velocityDirNeg;
+  }
+
   Ptr<Model> Highway::GetSedanModel()
   {
     return m_sedan;
