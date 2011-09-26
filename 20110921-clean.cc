@@ -37,6 +37,7 @@
 #include "ns3/random-variable.h"
 #include "math.h"
 #include "Highway.h"
+#include "VanetHeader.h"
 #include <list>
 
 NS_LOG_COMPONENT_DEFINE ("HADI");
@@ -46,11 +47,14 @@ using namespace std;
 
 static bool InitVehicle(Ptr<Highway> highway, int& VID);
 static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt);
-static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address);
+static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address address);
 // custom:
 static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction);
 static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction, double velocity, double location , bool control);
 static void ExponentialAddVehicles(Ptr<Highway> highway, int& VID, int direction);
+
+
+
 
 /* * * * * * */
 
@@ -118,9 +122,11 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 		list<unsigned int>::iterator iter = plist.begin();
 		while( iter != plist.end() )
 		{
-			unsigned int pID = 1337; stringstream msg;
-			msg << pID;
-			Ptr<Packet> packet = Create<Packet>( (uint8_t*)msg.str().c_str(), msg.str().length() );
+			Ptr<Packet> packet = Create<Packet>();
+			VanetHeader vHeader;
+			vHeader.SetSource(vehicle->GetVehicleId());
+			vHeader.SetID(*iter);
+			packet->AddHeader(vHeader);
 
 			vehicle->SendTo(vehicle->GetBroadcastAddress(), packet);
 
@@ -134,14 +140,46 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	else return false;
 }
 
-static void ReceiveData(Ptr<Vehicle> veh, Ptr<const Packet> packet, Address address)
+static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address address)
 {
 	// Extract PacketID
-	unsigned int pID; stringstream msg;
-	packet->CopyData (&msg, packet->GetSize());
-	msg >> pID;
+	VanetHeader vHeader;
+	packet->PeekHeader(vHeader);
 
-	cout << "LOG " << "GOT A PACKET " << pID << endl;
+	// Log packet reception
+	ns3::Time nowtime = ns3::Simulator::Now();
+	cout << "LOG " << nowtime.ns3::Time::GetSeconds() << " P"
+			<< " SRC " << vHeader.GetSource()
+			<< " DST " << vehicle->GetVehicleId()
+			<< " ID " << vHeader.GetID()
+			<< '\n';
+
+	// Check if we already have this packet
+	list<unsigned int> plist = vehicle->GetPacketList();	// get vehicle's packet list
+	list<unsigned int>::iterator iter = plist.begin();		// iterator
+	bool isNew=true;
+	while( iter != plist.end() && isNew==true )
+	{
+		if(*iter == vHeader.GetID()) isNew=false;
+		++iter;
+	}
+
+	// If this is a new packet
+	if(isNew==true)
+	{
+		// Immediate re-broadcast of packet
+		if( vehicle->GetVehicleId() != vHeader.GetSource() )
+		{
+			// Create a new packet, use earlier spawned header, update source
+			Ptr<Packet> newPacket = Create<Packet>();
+			vHeader.SetSource(vehicle->GetVehicleId());
+			newPacket->AddHeader(vHeader);
+			vehicle->SendTo(vehicle->GetBroadcastAddress(), newPacket);
+		}
+
+		// Save packet in re-broadcast list
+		vehicle->AddPacket(vHeader.GetID());
+	}
 }
 
 

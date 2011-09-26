@@ -8,5 +8,6 @@ def build(bld):
 	'Vehicle.cc',
 	'Model.cc',
 	'LaneChange.cc',
+	'VanetHeader.cc'
 	]
 
