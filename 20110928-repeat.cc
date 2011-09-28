@@ -48,6 +48,7 @@ using namespace std;
 static bool InitVehicle(Ptr<Highway> highway, int& VID);
 static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt);
 static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address address);
+double g_endVehicleID;
 
 /* * * * * * */
 
@@ -69,15 +70,21 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 
 	// Vehicle lanes start with 0 ( [0,m_numberOfLanes[ )
 	// Vehicle direction: 1 (normal), -1 (opposite)
+	// If scheduling an AddVehicle, always use AddVehicleAndSort() to sort vehicle lists
 
-
-	/* Add a stopped vehicle to position 5000, direction 1, manual control, and grab the vehicle's handle
+	/* Add a stopped vehicle to position 10km, direction 1, manual control, and grab the vehicle's handle
 	 * Add a packet to the vehicle's buffer, packetID 1337
 	 * Schedule the obstacle to appear at t=200s
 	 */
-	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 30.0, 5000, true);
+	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 0.0, 10000, true);
 	obstacle->AddPacket(1337);
-	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicle, highway, obstacle);
+	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicleAndSort, highway, obstacle);
+
+	// Schedule Destination vehicle, 10km away from the obstacle
+	Ptr<Vehicle> vehDst = highway->CreateVehicle(1);
+	g_endVehicleID = vehDst->GetVehicleId();
+	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicle, highway, vehDst);
+
 
 
 	// Trigger exponential generation of vehicles on direction 1
@@ -102,7 +109,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	ns3::Time nowtime = ns3::Simulator::Now();
 	float NOW = nowtime.ns3::Time::GetSeconds();
 
-	if((int)(NOW*10) % 10 == 0) // % f : frequency of updates (100->10sec, 10-> 1sec
+	if((int)(NOW*10) % 500 == 0) // % f : frequency of updates (100->10sec, 10-> 1sec
 		cout << "LOG " << nowtime.ns3::Time::GetSeconds() << " C " << vehicle->GetVehicleId() << ' '
 			<<  vehicle->GetPosition().x << "\tVEL " << vehicle->GetVelocity() << "\tACC " << vehicle->GetAcceleration()
 			<< "\tLANE " << vehicle->GetLane() << '\n';
@@ -127,7 +134,6 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 		}
 	}
 
-
 	// return false: a signal to highway that lets the vehicle automatically be handled (using IDM/MOBIL rules)
 	if(vehicle->GetManualControl()) return true;
 	else return false;
@@ -146,6 +152,10 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 			<< " DST " << vehicle->GetVehicleId()
 			<< " ID " << vHeader.GetID()
 			<< '\n';
+
+	// Break simulation if this is the destination vehicle getting the packet
+	if(vehicle->GetVehicleId()==g_endVehicleID)
+		Simulator::Stop();
 
 	/*
 	 * Check if we already have this packet
@@ -197,7 +207,7 @@ int main (int argc, char *argv[])
 	Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("2200"));
 
 	// Default values
-	float simTime=1000.0;				// simulation time
+	float simTime=5000.0;				// simulation time
 	bool twoDirectional=true;			// one or two directional
 	double flow1=0.0039, flow2=0.0039;	// traffic flow mean at entrance (veh/m)
 	double vel1=30, vel2=30;			// traffic velocity mean at entrance

@@ -340,6 +340,10 @@ namespace ns3
       * it will add the vehicle in to the Highway based on the vehicle lane and direction to the appropriate Highway list.
       */
       void AddVehicle(Ptr<Vehicle> vehicle);
+	  /**
+      * it will add the vehicle in to the Highway and sort vehicle lists.
+      */
+      void AddVehicleAndSort(Ptr<Vehicle> vehicle);
       /**
       * \returns the last (currently) value of auto-incremented Vehicle Id.
       */

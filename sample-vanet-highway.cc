@@ -77,13 +77,14 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	// You can nest the two functions if you don't need the handle
 	highway->AddVehicle(highway->CreateVehicle(2));
 
-	/* Add a stopped vehicle to position 5000, direction 1, manual control, and grab the vehicle's handle
-	 * Add a packet to the vehicle's buffer, packetID 1337
+	/* Add a stopped vehicle (obstacle) to position 5000, direction 1, manual control, and grab the vehicle's handle
+	 * Add a packet to the obstacle's buffer, packetID 1337
 	 * Schedule the obstacle to appear at t=200s
+	 * If scheduling an AddVehicle, always use AddVehicleAndSort() to sort vehicle lists
 	 */
-	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 30.0, 5000, true);
+	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 0.0, 5000, true);
 	obstacle->AddPacket(1337);
-	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicle, highway, obstacle);
+	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicleAndSort, highway, obstacle);
 
 	// Trigger exponential generation of vehicles on direction 1
 	highway->ExponentialAddVehicles(highway, 1);

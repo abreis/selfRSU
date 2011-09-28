@@ -935,6 +935,25 @@ namespace ns3
       }
   }
 
+  void Highway::AddVehicleAndSort(Ptr<Vehicle> vehicle)
+    {
+      int lane=vehicle->GetLane();
+      int dir=vehicle->GetDirection();
+      if(lane < m_numberOfLanes && lane >= 0)
+        {
+          if(dir==1)
+  		  m_vehicles[lane].push_back(vehicle);
+          else if(dir==-1)
+  		  m_vehiclesOpp[lane].push_back(vehicle);
+        }
+	  for(int i=0;i<m_numberOfLanes;i++)
+		{
+		  m_vehicles[i].sort(ns3::Vehicle::Compare);
+		  if(m_twoDirectional==true)
+			m_vehiclesOpp[i].sort(ns3::Vehicle::Compare);
+		}
+    }
+
   Ptr<Vehicle> Highway::FindVehicle(int vid)
   {
     Ptr<Vehicle> v=0;
