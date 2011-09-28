@@ -562,6 +562,7 @@ namespace ns3
 	m_remainderDirPos=0;
 	m_remainderDirNeg=0;
 	m_penetrationRate=100;
+	m_brakingAccel=-5.0;
 	m_RVFlowDirPos = UniformVariable(m_flowDirPos*m_dt, m_flowDirPos*m_dt);
 	m_RVFlowDirNeg = UniformVariable(m_flowDirNeg*m_dt, m_flowDirPos*m_dt);
 
@@ -724,14 +725,14 @@ namespace ns3
 	  m_RVFlowDirPos = rv;
   }
 
-  void Highway::SetBrake(bool value)
+  void Highway::SetBrakingAccel(double acc)
   {
-	  m_brake = value;
+	  m_brakingAccel = acc;
   }
 
-  bool Highway::GetBrake()
+  double Highway::GetBrakingAccel(void)
   {
-	  return m_brake;
+	  return m_brakingAccel;
   }
 
   void Highway::SetFlowRVNegativeDirection(RandomVariable rv)

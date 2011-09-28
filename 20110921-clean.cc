@@ -154,7 +154,9 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 			<< " ID " << vHeader.GetID()
 			<< '\n';
 
-	// Check if we already have this packet
+	/*
+	 * Check if we already have this packet
+	 */
 	list<unsigned int> plist = vehicle->GetPacketList();	// get vehicle's packet list
 	list<unsigned int>::iterator iter = plist.begin();		// iterator
 	bool isNew=true;
@@ -180,6 +182,19 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 		// Save packet in re-broadcast list
 		vehicle->AddPacket(vHeader.GetID());
 	}
+
+	/*
+	 * Actions based on packet payload. If ID=1337, order vehicle to brake
+	 * Only eastbound vehicles brake
+	 * If emergency braking acceleration is set to 0.0, then ignore this process
+	 */
+	if(vHeader.GetID()==1337)
+		if(vehicle->GetDirection()==1)
+			if(vehicle->GetBrakingAccel()!=0.0)
+			{
+				vehicle->SetManualControl(true);
+				vehicle->SetAcceleration(vehicle->GetBrakingAccel());
+			}
 }
 
 
@@ -197,6 +212,7 @@ static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction)
     temp->SetLane(0);
     temp->SetVelocity(velocity);
     temp->SetManualControl(false);
+    temp->SetBrakingAccel(highway->GetBrakingAccel());
     temp->SetAcceleration(0.0);
 	Ptr<Model> tempModel=highway->CreateSedanModel();
 	tempModel->SetDesiredVelocity(velocity);
@@ -222,6 +238,7 @@ static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction, do
     temp->SetLane(0);
     temp->SetVelocity(velocity);
     temp->SetManualControl(control);
+    temp->SetBrakingAccel(highway->GetBrakingAccel());
     temp->SetAcceleration(0.0);
 	Ptr<Model> tempModel=highway->CreateSedanModel();
 	tempModel->SetDesiredVelocity(velocity);

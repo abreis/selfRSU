@@ -74,6 +74,7 @@ namespace ns3
       bool m_brake;					// vehicle's braking status.
       bool m_control;				// vehicle is manually controlled
       list<unsigned int> p_buffer;	// packet storage
+      double m_brakingAccel;		// sudden braking acceleration
 
 	  /// Catching an event when a packet is received.
       VehicleReceiveCallback m_receive;
@@ -269,6 +270,8 @@ namespace ns3
 
       list<unsigned int> GetPacketList();
       void AddPacket(unsigned int pID);
+	  void SetBrakingAccel(double acc);
+	  double GetBrakingAccel(void);
 
       /// is used for purpose of sorting vehicles based on their positions in a list or a queue.
       static bool Compare(Ptr<Vehicle> v1, Ptr<Vehicle> v2);

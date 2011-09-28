@@ -276,6 +276,16 @@ namespace ns3
     p_buffer.push_back(pID);
   }
 
+  void Vehicle::SetBrakingAccel(double acc)
+  {
+	  m_brakingAccel = acc;
+  }
+
+  double Vehicle::GetBrakingAccel(void)
+  {
+	  return m_brakingAccel;
+  }
+
   bool Vehicle::SendTo(Address address, Ptr<Packet> packet)
   {
     return m_device->Send(packet, address, 1);

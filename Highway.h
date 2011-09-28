@@ -86,7 +86,7 @@ namespace ns3
       YansWifiPhyHelper m_wifiPhyHelper;    // a wifi phy helper apply to setup vehicles Wifi
       YansWifiChannelHelper m_wifiChannelHelper; // a wifi channel helper apply to setup vehicles Wifi
       Ptr<YansWifiChannel> m_wifiChannel;   // the common Wifi Channel created by Highway which is being shared by the vehicles to communicate.
-      bool m_brake;							// whether the vehicles should break on emergency message
+      double m_brakingAccel;				// sudden braking acceleration
 
       /// Initializes the Highway and raises the event InitVehicle.
       void InitHighway();
@@ -330,8 +330,8 @@ namespace ns3
 	  */
 	  void SetSpeedRV(RandomVariable rv);
 
-	  void SetBrake(bool value);
-	  bool GetBrake();
+	  void SetBrakingAccel(double acc);
+	  double GetBrakingAccel(void);
 
 	  /**
       * it will add the vehicle in to the Highway based on the vehicle lane and direction to the appropriate Highway list.
