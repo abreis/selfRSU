@@ -286,6 +286,7 @@ int main (int argc, char *argv[])
 //	double speedStd=0;					// speed std
 	double transmissionPower=21.5;		// transmission power (250-300 meter transmission range)
 	double deltaT=0.1;					// simulation step
+	double brakingAccel=0.0;			// braking acceleration
 	string directory="./";				//
 	string fp="";						// prefix for filenames
 	directory+=fp;
@@ -302,6 +303,7 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("lane", "number of lanes (per direction)", numberOfLanes);
 	cmd.AddValue ("lc", "lane change", laneChange);
 	cmd.AddValue ("rn", "run number", runNumber);
+	cmd.AddValue ("brake", "braking acceleration (negative)", brakingAccel);
 	cmd.Parse(argc, argv);
 
 	// Build an exponential variable (unit: seconds per vehicle), and an upper bound 5 times higher to prevent flukes
@@ -320,6 +322,7 @@ int main (int argc, char *argv[])
 	highway->SetChangeLane(laneChange);
 	highway->SetFlowRVPositiveDirection(RV1);
 	highway->SetFlowRVNegativeDirection(RV2);
+	highway->SetBrakingAccel(brakingAccel);
 	// unused:
 //	highway->SetSpeedRV(RVSpeed);
 	highway->SetLaneWidth(5);
