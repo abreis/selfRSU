@@ -332,6 +332,9 @@ namespace ns3
 
 	  void SetBrakingAccel(double acc);
 	  double GetBrakingAccel(void);
+	  Ptr<Vehicle> CreateVehicle(int direction);
+	  Ptr<Vehicle> CreateVehicle(int direction, double velocity, double location, bool control);
+	  static void ExponentialAddVehicles(Ptr<Highway> highway, int direction);
 
 	  /**
       * it will add the vehicle in to the Highway based on the vehicle lane and direction to the appropriate Highway list.

@@ -735,6 +735,70 @@ namespace ns3
 	  return m_brakingAccel;
   }
 
+  Ptr<Vehicle> Highway::CreateVehicle(int direction)
+  {
+	Ptr<Vehicle> temp=CreateObject<Vehicle>();
+	double velocity = (direction==1) ? m_velocityDirPos : m_velocityDirNeg;
+
+	temp->IsEquipped = true;
+	temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+	temp->SetVehicleId(m_vehicleId++);
+	temp->SetDirection(direction);
+	temp->SetPosition(Vector( (direction==1)?(-4):(m_highwayLength+4) , GetYForLane(0,direction), 0));
+	temp->SetLane(0);
+	temp->SetVelocity(velocity);
+	temp->SetManualControl(false);
+	temp->SetBrakingAccel(m_brakingAccel);
+	temp->SetAcceleration(0.0);
+	Ptr<Model> tempModel=CreateSedanModel();
+	tempModel->SetDesiredVelocity(velocity);
+	temp->SetModel(tempModel);
+	temp->SetLaneChange(m_laneChangeSedan);
+	temp->SetLength(4);
+	temp->SetWidth(2);
+	temp->SetReceiveCallback(m_receiveData);
+
+	AddVehicle(temp);
+	return temp;
+  }
+
+  Ptr<Vehicle> Highway::CreateVehicle(int direction, double velocity, double location, bool control)
+  {
+	Ptr<Vehicle> temp=CreateObject<Vehicle>();
+
+	temp->IsEquipped = true;
+	temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+	temp->SetVehicleId(m_vehicleId++);
+	temp->SetDirection(direction);
+	temp->SetPosition(Vector(location, GetYForLane(0,direction), 0));
+	temp->SetLane(0);
+	temp->SetVelocity(velocity);
+	temp->SetManualControl(control);
+	temp->SetBrakingAccel(m_brakingAccel);
+	temp->SetAcceleration(0.0);
+	Ptr<Model> tempModel=CreateSedanModel();
+	tempModel->SetDesiredVelocity(velocity);
+	temp->SetModel(tempModel);
+	temp->SetLaneChange(m_laneChangeSedan);
+	temp->SetLength(4);
+	temp->SetWidth(2);
+	temp->SetReceiveCallback(m_receiveData);
+
+	AddVehicle(temp);
+	return temp;
+  }
+
+  void Highway::ExponentialAddVehicles(Ptr<Highway> highway, int direction)
+  {
+	highway->CreateVehicle(direction);
+
+	// Recursive call & schedule
+	RandomVariable RV=(direction==1)? highway->GetFlowRVPositiveDirection() : highway->GetFlowRVNegativeDirection();
+	double deltaExp = RV.GetValue();
+	// Schedule next ExponentialAddVehicles(Highway) on this lane and direction
+	Simulator::Schedule(Seconds(deltaExp), &Highway::ExponentialAddVehicles, highway, direction);
+  }
+
   void Highway::SetFlowRVNegativeDirection(RandomVariable rv)
   {
 	  m_RVFlowDirNeg = rv;

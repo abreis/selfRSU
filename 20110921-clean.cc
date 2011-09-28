@@ -48,13 +48,6 @@ using namespace std;
 static bool InitVehicle(Ptr<Highway> highway, int& VID);
 static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt);
 static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address address);
-// custom:
-static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction);
-static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction, double velocity, double location , bool control);
-static void ExponentialAddVehicles(Ptr<Highway> highway, int& VID, int direction);
-
-
-
 
 /* * * * * * */
 
@@ -78,17 +71,17 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	// Vehicle direction: 1 (normal), -1 (opposite)
 
 	// Simple, add a vehicle, direction 1
-//	AddVehicle(highway, VID, 1);
+//	highway->CreateVehicle(highway, VID, 1);
 
 	// Add a stopped vehicle to position 5000, direction 1, manual control, and grab the vehicle's handle
 	Ptr<Vehicle> obstacle;
-	obstacle=AddVehicle(highway, VID, 1, 0.0, 5000.0, true);
+	obstacle=highway->CreateVehicle(1, 0.0, 5000.0, true);
 
 	// Add a packet to the vehicle's buffer, packetID 1337
 	obstacle->AddPacket(1337);
 
 	// Trigger exponential generation of vehicles on direction 1
-	ExponentialAddVehicles(highway, VID, 1);
+	highway->ExponentialAddVehicles(highway, 1);
 
 	/*
 	 * Return true: a signal to highway that the lane lists (queues) in where obstacles and vehicles are being added
@@ -196,73 +189,6 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 				vehicle->SetAcceleration(vehicle->GetBrakingAccel());
 			}
 }
-
-
-// custom:
-static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction)
-{
-    Ptr<Vehicle> temp=CreateObject<Vehicle>();
-    double velocity = (direction==1) ? highway->GetVelocityPositiveDirection() : highway->GetVelocityNegativeDirection();
-
-	temp->IsEquipped = true;
-	temp->SetupWifi(highway->GetWifiHelper(), highway->GetYansWifiPhyHelper(), highway->GetNqosWifiMacHelper());
-    temp->SetVehicleId(VID++);
-    temp->SetDirection(direction);
-	temp->SetPosition(Vector( (direction==1)?(-4):(highway->GetHighwayLength()+4) , highway->GetYForLane(0,direction), 0));
-    temp->SetLane(0);
-    temp->SetVelocity(velocity);
-    temp->SetManualControl(false);
-    temp->SetBrakingAccel(highway->GetBrakingAccel());
-    temp->SetAcceleration(0.0);
-	Ptr<Model> tempModel=highway->CreateSedanModel();
-	tempModel->SetDesiredVelocity(velocity);
-    temp->SetModel(tempModel);
-    temp->SetLaneChange(highway->GetSedanLaneChange());
-    temp->SetLength(4);
-    temp->SetWidth(2);
-    temp->SetReceiveCallback(highway->GetReceiveDataCallback());
-
-    highway->AddVehicle(temp);
-    return temp;
-}
-
-static Ptr<Vehicle> AddVehicle(Ptr<Highway> highway, int& VID, int direction, double velocity, double location, bool control)
-{
-    Ptr<Vehicle> temp=CreateObject<Vehicle>();
-
-	temp->IsEquipped = true;
-	temp->SetupWifi(highway->GetWifiHelper(), highway->GetYansWifiPhyHelper(), highway->GetNqosWifiMacHelper());
-    temp->SetVehicleId(VID++);
-    temp->SetDirection(direction);
-	temp->SetPosition(Vector(location, highway->GetYForLane(0,direction), 0));
-    temp->SetLane(0);
-    temp->SetVelocity(velocity);
-    temp->SetManualControl(control);
-    temp->SetBrakingAccel(highway->GetBrakingAccel());
-    temp->SetAcceleration(0.0);
-	Ptr<Model> tempModel=highway->CreateSedanModel();
-	tempModel->SetDesiredVelocity(velocity);
-    temp->SetModel(tempModel);
-    temp->SetLaneChange(highway->GetSedanLaneChange());
-    temp->SetLength(4);
-    temp->SetWidth(2);
-    temp->SetReceiveCallback(highway->GetReceiveDataCallback());
-
-    highway->AddVehicle(temp);
-    return temp;
-}
-
-static void ExponentialAddVehicles(Ptr<Highway> highway, int& VID, int direction)
-{
-	AddVehicle(highway, VID, direction);
-
-	// Recursive call & schedule
-    RandomVariable RV=(direction==1)?(highway->GetFlowRVPositiveDirection()):(highway->GetFlowRVNegativeDirection());
-	double deltaExp = RV.GetValue();
-	// Schedule next ExponentialAddVehicles(Highway) on this lane and direction
-	Simulator::Schedule(Seconds(deltaExp), &ExponentialAddVehicles, highway, VID, direction);
-}
-
 
 int main (int argc, char *argv[])
 { 
