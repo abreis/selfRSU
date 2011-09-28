@@ -758,7 +758,6 @@ namespace ns3
 	temp->SetWidth(2);
 	temp->SetReceiveCallback(m_receiveData);
 
-	AddVehicle(temp);
 	return temp;
   }
 
@@ -784,13 +783,12 @@ namespace ns3
 	temp->SetWidth(2);
 	temp->SetReceiveCallback(m_receiveData);
 
-	AddVehicle(temp);
 	return temp;
   }
 
   void Highway::ExponentialAddVehicles(Ptr<Highway> highway, int direction)
   {
-	highway->CreateVehicle(direction);
+	highway->AddVehicle(highway->CreateVehicle(direction));
 
 	// Recursive call & schedule
 	RandomVariable RV=(direction==1)? highway->GetFlowRVPositiveDirection() : highway->GetFlowRVNegativeDirection();

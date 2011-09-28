@@ -70,22 +70,27 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	// Vehicle lanes start with 0 ( [0,m_numberOfLanes[ )
 	// Vehicle direction: 1 (normal), -1 (opposite)
 
-	// Simple, add a vehicle, direction 1
-//	highway->CreateVehicle(highway, VID, 1);
+	// Simple, add a vehicle, direction 1:
+	Ptr<Vehicle> veh1 = highway->CreateVehicle(1);
+	highway->AddVehicle(vehicle1);
 
-	// Add a stopped vehicle to position 5000, direction 1, manual control, and grab the vehicle's handle
-	Ptr<Vehicle> obstacle;
-	obstacle=highway->CreateVehicle(1, 0.0, 5000.0, true);
+	// You can nest the two functions if you don't need the handle
+	highway->AddVehicle(highway->CreateVehicle(2));
 
-	// Add a packet to the vehicle's buffer, packetID 1337
+	/* Add a stopped vehicle to position 5000, direction 1, manual control, and grab the vehicle's handle
+	 * Add a packet to the vehicle's buffer, packetID 1337
+	 * Schedule the obstacle to appear at t=200s
+	 */
+	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 30.0, 5000, true);
 	obstacle->AddPacket(1337);
+	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicle, highway, obstacle);
 
 	// Trigger exponential generation of vehicles on direction 1
 	highway->ExponentialAddVehicles(highway, 1);
 
 	/*
-	 * Return true: a signal to highway that the lane lists (queues) in where obstacles and vehicles are being added
-	 * must be sorted based on their positions.
+	 * Return true: a signal to highway that the lane lists (queues) in where obstacles
+	 * and vehicles are being added must be sorted based on their positions.
 	 * Return false: to ignore sorting.
 	 * ! Do not return false when vehicles are manually added to the highway.
 	 */
