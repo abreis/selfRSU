@@ -87,7 +87,7 @@ namespace ns3
 
   char Vehicle::GetCharDirection()
   {
-	return m_direction==1 ? 'W' : 'E';
+	return m_direction==1 ? 'E' : 'W';
   }
 
   int Vehicle::GetVehicleId()

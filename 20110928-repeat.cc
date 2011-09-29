@@ -74,21 +74,23 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 
 	/* Add a stopped vehicle to position 10km, direction 1, manual control, and grab the vehicle's handle
 	 * Add a packet to the vehicle's buffer, packetID 1337
-	 * Schedule the obstacle to appear at t=200s
+	 * Schedule the obstacle to appear at t=400s
 	 */
-	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 0.0, 10000, true);
+	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 0.0, 10500, true);
 	obstacle->AddPacket(1337);
-	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicleAndSort, highway, obstacle);
+	Simulator::Schedule(Seconds(400.0), &ns3::Highway::AddVehicleAndSort, highway, obstacle);
 
 	// Schedule Destination vehicle, 10km away from the obstacle
-	Ptr<Vehicle> vehDst = highway->CreateVehicle(1);
+	Ptr<Vehicle> vehDst = highway->CreateVehicle(1, 30.0, 500, false);
 	g_endVehicleID = vehDst->GetVehicleId();
-	Simulator::Schedule(Seconds(200.0), &ns3::Highway::AddVehicle, highway, vehDst);
+	Simulator::Schedule(Seconds(400.0), &ns3::Highway::AddVehicle, highway, vehDst);
 
 
 
 	// Trigger exponential generation of vehicles on direction 1
 	highway->ExponentialAddVehicles(highway, 1);
+	if(highway->GetTwoDirectional())
+		highway->ExponentialAddVehicles(highway, -1);
 
 	/*
 	 * Return true: a signal to highway that the lane lists (queues) in where obstacles
@@ -110,9 +112,13 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	float NOW = nowtime.ns3::Time::GetSeconds();
 
 	if((int)(NOW*10) % 500 == 0) // % f : frequency of updates (100->10sec, 10-> 1sec
-		cout << "LOG " << nowtime.ns3::Time::GetSeconds() << " C " << vehicle->GetVehicleId() << ' '
-			<<  vehicle->GetPosition().x << "\tVEL " << vehicle->GetVelocity() << "\tACC " << vehicle->GetAcceleration()
-			<< "\tLANE " << vehicle->GetLane() << '\n';
+		cout << "LOG " << nowtime.ns3::Time::GetSeconds()
+			<< " C " << vehicle->GetCharDirection() << vehicle->GetVehicleId()
+			<< ' ' <<  vehicle->GetPosition().x
+			<< "\tVEL " << vehicle->GetVelocity()
+			<< "\tACC " << vehicle->GetAcceleration()
+			<< "\tLANE " << vehicle->GetLane()
+			<< '\n';
 
 
 	// Broadcast all packets in broadcast buffer
@@ -155,7 +161,10 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 
 	// Break simulation if this is the destination vehicle getting the packet
 	if(vehicle->GetVehicleId()==g_endVehicleID)
+	{
+		cout << "DING " << nowtime.ns3::Time::GetSeconds() << '\n';
 		Simulator::Stop();
+	}
 
 	/*
 	 * Check if we already have this packet
@@ -208,10 +217,10 @@ int main (int argc, char *argv[])
 
 	// Default values
 	float simTime=5000.0;				// simulation time
-	bool twoDirectional=true;			// one or two directional
+	bool twoDirectional=false;			// one or two directional
 	double flow1=0.0039, flow2=0.0039;	// traffic flow mean at entrance (veh/m)
 	double vel1=30, vel2=30;			// traffic velocity mean at entrance
-	int numberOfLanes=3;				// number of lanes (per direction)
+	int numberOfLanes=1;				// number of lanes (per direction)
 	bool laneChange=false;				// lane change
 	int runNumber=1;					// run number
 	// unused:
@@ -240,6 +249,7 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("lc", "lane change", laneChange);
 	cmd.AddValue ("rn", "run number", runNumber);
 	cmd.AddValue ("brake", "braking acceleration (negative)", brakingAccel);
+	cmd.AddValue ("power", "transmission power", transmissionPower);
 	cmd.Parse(argc, argv);
 
 	// Build an exponential variable (unit: seconds per vehicle), and an upper bound 5 times higher to prevent flukes
@@ -248,7 +258,7 @@ int main (int argc, char *argv[])
 
 	// Create and setup a highway
 	Ptr<Highway> highway=CreateObject<Highway>();
-	highway->SetHighwayLength(10000);
+	highway->SetHighwayLength(11000);
 	highway->SetTwoDirectional(twoDirectional);
 	highway->SetFlowPositiveDirection(flow1);
 	highway->SetFlowNegativeDirection(flow2);
