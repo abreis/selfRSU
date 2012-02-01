@@ -81,6 +81,7 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	vHeader.SetID(1337);
 	vHeader.SetSource(obstacle->GetVehicleId());
 	vHeader.SetTimestamp(400.0); 	// must match time below
+	vHeader.SetPosRX(10500);		// must match position above
 	obstacle->AddPacket(vHeader);
 	Simulator::Schedule(Seconds(400.0), &ns3::Highway::AddVehicleAndSort, highway, obstacle);
 
@@ -135,6 +136,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 			Ptr<Packet> packet = Create<Packet>();
 			VanetHeader vHeader = *iter;
 			vHeader.SetSource(vehicle->GetVehicleId());
+			vHeader.SetPosTX(vehicle->GetPosition().x);	// update TX position for every rebroadcast
 			packet->AddHeader(vHeader);
 
 			vehicle->SendTo(vehicle->GetBroadcastAddress(), packet);
@@ -190,12 +192,22 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 		if(vHeader.GetSource() < vehicle->GetVehicleId() )
 		{
 			double packetDelay = nowtime.ns3::Time::GetSeconds() - vHeader.GetTimestamp();
-			cout << "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
+			// determine range (source TX position to us)
+			double range = vHeader.GetPosTX() - vehicle->GetPosition().x;
+			// determine gap (source RX position to us)
+			double gap = vHeader.GetPosRX() - vehicle->GetPosition().x;
+
+			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
 					<< " SRC " << vHeader.GetSource()
 					<< " DST " << vehicle->GetVehicleId()
 					<< " ID " << vHeader.GetID()
-					<< " DELAY " << packetDelay
-					<< '\n';
+					<< " DELAY " << packetDelay;
+			if(packetDelay>0.1)	// safe criteria for direct/not direct
+			{
+			cout 	<< " GAP " << gap
+					<< " RANGE " << range;
+			}
+			cout 	<< '\n';
 		}
 		/* === DEBUG CODE END === */
 
@@ -203,13 +215,15 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 		// If packet didn't come from ourselves (yes, this happens)
 		if( vehicle->GetVehicleId() != vHeader.GetSource() )
 		{
-			// Immediate re-broadcast of packet
 
 			// Create a new packet, use earlier spawned header, update source
 			Ptr<Packet> newPacket = Create<Packet>();
 			vHeader.SetSource(vehicle->GetVehicleId());
 			vHeader.SetTimestamp(nowtime.ns3::Time::GetSeconds());
+			vHeader.SetPosRX(vehicle->GetPosition().x);	// store position on reception
 			newPacket->AddHeader(vHeader);
+
+			// Immediate re-broadcast of packet
 			vehicle->SendTo(vehicle->GetBroadcastAddress(), newPacket);
 
 			// Save packet in re-broadcast list

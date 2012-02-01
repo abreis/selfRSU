@@ -41,7 +41,7 @@ namespace ns3
   class HadiHeader;
   
   /// define type VehicleReceiveCallback.
-  typedef Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> VehicleReceiveCallback; 
+  typedef Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> VehicleReceiveCallback;
 
   /**
   * \brief Vehicle is a mobile Object which follows the given IDM/MOBIL mobility Model and LaneChange rules.
