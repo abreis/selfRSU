@@ -115,7 +115,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	ns3::Time nowtime = ns3::Simulator::Now();
 	float NOW = nowtime.ns3::Time::GetSeconds();
 
-	if((int)(NOW*10) % 500 == 0) // % f : frequency of updates (100->10sec, 10-> 1sec
+	if((int)(NOW*10) % 500 == 0) // % f : frequency of updates (100->10sec, 10-> 1sec)
 		cout << "LOG " << nowtime.ns3::Time::GetSeconds()
 			<< " C " << vehicle->GetCharDirection() << vehicle->GetVehicleId()
 			<< ' ' <<  vehicle->GetPosition().x
@@ -162,13 +162,6 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 			<< " ID " << vHeader.GetID()
 			<< '\n';
 
-	// Break simulation if this is the destination vehicle getting the packet
-	if(vehicle->GetVehicleId()==g_endVehicleID)
-	{
-		cout << "DING " << nowtime.ns3::Time::GetSeconds() << '\n';
-		Simulator::Stop();
-	}
-
 	/*
 	 * Check if we already have this packet
 	 */
@@ -197,8 +190,6 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 		if(vHeader.GetSource() < vehicle->GetVehicleId() )
 		{
 			double packetDelay = nowtime.ns3::Time::GetSeconds() - vHeader.GetTimestamp();
-
-
 			cout << "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
 					<< " SRC " << vHeader.GetSource()
 					<< " DST " << vehicle->GetVehicleId()
@@ -206,6 +197,7 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 					<< " DELAY " << packetDelay
 					<< '\n';
 		}
+		/* === DEBUG CODE END === */
 
 
 		// If packet didn't come from ourselves (yes, this happens)
@@ -237,6 +229,13 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 				vehicle->SetManualControl(true);
 				vehicle->SetAcceleration(vehicle->GetBrakingAccel());
 			}
+
+	// Break simulation if this is the destination vehicle getting the packet
+	if(vehicle->GetVehicleId()==g_endVehicleID)
+	{
+		cout << "DING " << nowtime.ns3::Time::GetSeconds() << '\n';
+		Simulator::Stop();
+	}
 }
 
 int main (int argc, char *argv[])
