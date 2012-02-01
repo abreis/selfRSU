@@ -266,14 +266,14 @@ namespace ns3
 	  m_control = control;
   }
 
-  list<unsigned int> Vehicle::GetPacketList()
+  list<VanetHeader> Vehicle::GetPacketList()
   {
     return p_buffer;
   }
 
-  void Vehicle::AddPacket(unsigned int pID)
+  void Vehicle::AddPacket(VanetHeader header)
   {
-    p_buffer.push_back(pID);
+    p_buffer.push_back(header);
   }
 
   void Vehicle::SetBrakingAccel(double acc)

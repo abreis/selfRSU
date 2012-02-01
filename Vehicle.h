@@ -31,6 +31,7 @@
 #include "ns3/wifi-module.h"
 #include "Model.h"
 #include "LaneChange.h"
+#include "VanetHeader.h"
 #include <list>
 
 namespace ns3
@@ -73,7 +74,7 @@ namespace ns3
       Ptr<NetDevice> m_device;      // vehicle has a device
       bool m_brake;					// vehicle's braking status.
       bool m_control;				// vehicle is manually controlled
-      list<unsigned int> p_buffer;	// packet storage
+      list<VanetHeader> p_buffer;	// packet storage
       double m_brakingAccel;		// sudden braking acceleration
 
 	  /// Catching an event when a packet is received.
@@ -268,8 +269,8 @@ namespace ns3
       */
       void SetManualControl(bool control);
 
-      list<unsigned int> GetPacketList();
-      void AddPacket(unsigned int pID);
+      list<VanetHeader> GetPacketList();
+      void AddPacket(VanetHeader header);
 	  void SetBrakingAccel(double acc);
 	  double GetBrakingAccel(void);
 

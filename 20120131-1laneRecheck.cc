@@ -77,7 +77,11 @@ static bool InitVehicle(Ptr<Highway> highway, int& VID)
 	 * Schedule the obstacle to appear at t=400s
 	 */
 	Ptr<Vehicle> obstacle = highway->CreateVehicle(1, 0.0, 10500, true);
-	obstacle->AddPacket(1337);
+	VanetHeader vHeader;
+	vHeader.SetID(1337);
+	vHeader.SetSource(obstacle->GetVehicleId());
+	vHeader.SetTimestamp(400.0); 	// must match time below
+	obstacle->AddPacket(vHeader);
 	Simulator::Schedule(Seconds(400.0), &ns3::Highway::AddVehicleAndSort, highway, obstacle);
 
 	// Schedule Destination vehicle, 10km away from the obstacle
@@ -124,14 +128,13 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 	// Broadcast all packets in broadcast buffer
 	if( vehicle->IsAlive()==true )
 	{
-		list<unsigned int> plist = vehicle->GetPacketList();
-		list<unsigned int>::iterator iter = plist.begin();
+		list<VanetHeader> plist = vehicle->GetPacketList();
+		list<VanetHeader>::iterator iter = plist.begin();
 		while( iter != plist.end() )
 		{
 			Ptr<Packet> packet = Create<Packet>();
-			VanetHeader vHeader;
+			VanetHeader vHeader = *iter;
 			vHeader.SetSource(vehicle->GetVehicleId());
-			vHeader.SetID(*iter);
 			packet->AddHeader(vHeader);
 
 			vehicle->SendTo(vehicle->GetBroadcastAddress(), packet);
@@ -169,12 +172,12 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 	/*
 	 * Check if we already have this packet
 	 */
-	list<unsigned int> plist = vehicle->GetPacketList();	// get vehicle's packet list
-	list<unsigned int>::iterator iter = plist.begin();		// iterator
+	list<VanetHeader> plist = vehicle->GetPacketList();	// get vehicle's packet list
+	list<VanetHeader>::iterator iter = plist.begin();		// iterator
 	bool isNew=true;
 	while( iter != plist.end() && isNew==true )
 	{
-		if(*iter == vHeader.GetID()) isNew=false;
+		if(iter->GetID() == vHeader.GetID()) isNew=false;
 		++iter;
 	}
 
@@ -205,20 +208,21 @@ static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address 
 		}
 
 
-
-		// Immediate re-broadcast of packet
+		// If packet didn't come from ourselves (yes, this happens)
 		if( vehicle->GetVehicleId() != vHeader.GetSource() )
 		{
+			// Immediate re-broadcast of packet
+
 			// Create a new packet, use earlier spawned header, update source
 			Ptr<Packet> newPacket = Create<Packet>();
 			vHeader.SetSource(vehicle->GetVehicleId());
 			vHeader.SetTimestamp(nowtime.ns3::Time::GetSeconds());
 			newPacket->AddHeader(vHeader);
 			vehicle->SendTo(vehicle->GetBroadcastAddress(), newPacket);
-		}
 
-		// Save packet in re-broadcast list
-		vehicle->AddPacket(vHeader.GetID());
+			// Save packet in re-broadcast list
+			vehicle->AddPacket(vHeader);
+		}
 	}
 
 	/*
