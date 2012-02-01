@@ -20,14 +20,17 @@ class VanetHeader : public Header
 	private:
 		int16_t m_src;
 		uint16_t m_id;
+		uint64_t m_timestamp;
 	public:
 		VanetHeader();
 		virtual ~VanetHeader();
 
 		void SetSource(int src);
 		void SetID(unsigned int id);
+		void SetTimestamp(double time);
 		int GetSource(void) const;
 		unsigned int GetID(void) const;
+		double GetTimestamp(void) const;
 
 		static TypeId GetTypeId (void);
 		virtual TypeId GetInstanceTypeId (void) const;
