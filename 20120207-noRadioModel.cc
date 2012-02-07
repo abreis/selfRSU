@@ -74,10 +74,12 @@ void broadcastPacket(Ptr<Vehicle> srcVehicle, VanetHeader packet)
 	 *
 	 */
 
-//	double srcPos = srcVehicle->GetPosition().x;
+
+	// we are the source
+	packet.SetSource(srcVehicle->GetVehicleId());
+
 	list<Ptr<Vehicle> > vehiclesInRange = g_highway->FindVehiclesInRange(srcVehicle, g_highway->GetRange());
 	list<Ptr<Vehicle> >::iterator iter = vehiclesInRange.begin();		// iterator
-
 
 	// every car in 'vehiclesInRange' should get 'packet'
 	while( iter != vehiclesInRange.end() )
@@ -160,9 +162,7 @@ static bool ControlVehicle(Ptr<Highway> highway, Ptr<Vehicle> vehicle, double dt
 		{
 			VanetHeader newPacket = *iter;
 			newPacket.SetSource(vehicle->GetVehicleId());
-
 			broadcastPacket(vehicle, newPacket);
-
 			++iter;
 		}
 	}
@@ -199,56 +199,50 @@ static void ReceiveData(Ptr<Vehicle> vehicle, VanetHeader packet)
 				<< '\n';
 
 
+		/* === DEBUG CODE === */
+		/* packet is modified in this routine, debug code must go here
+		 * If this is a new packet, print distance to previous vehicle,
+		 * delay from previous vehicle
+		 *
+		 * ? Store absolute position so as to determine when packet is going in the right or wrong direction
+		 * Cars are added linearly, so just check if source ID is smaller than ours
+		 */
 		// if we got this packet from a vehicle in front of us
-//		if(packet.GetSource() < vehicle->GetVehicleId() )
-//		{
-			//		/* === DEBUG CODE === */
-//		/* vHeader is modified in this routine, debug code must go here
-//		 * If this is a new packet, print distance to previous vehicle,
-//		 * delay from previous vehicle
-//		 *
-//		 * ? Store absolute position so as to determine when packet is going in the right or wrong direction
-//		 * Cars are added linearly, so just check if source ID is smaller than ours
-//		 */
-//			double packetDelay = nowtime.ns3::Time::GetSeconds() - packet.GetTimestamp();
-//
-//			/* determine range (source TX position to us)
-//			 * get src vehicle handle, get src vehicle position
-//			 */
-//			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(vHeader.GetSource());
-//			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
-//
-//			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
-//					<< " SRC " << vHeader.GetSource()
-//					<< " DST " << vehicle->GetVehicleId()
-//					<< " ID " << vHeader.GetID()
-//					<< " DELAY " << packetDelay
-////			if(packetDelay>0.1)	// safe criteria for direct/not direct
-//					<< " RANGE " << range
-//					<< '\n';
-//
-//			// print the distance to the next node
-//			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
-//			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
-//			cout << "DEBUG CAR " << vehicle->GetVehicleId() << " NEXT CAR " << vehicle->GetVehicleId()+1 << " DISTANCE " << nextHopDistance << '\n';
-//		}
-//		/* === DEBUG CODE END === */
-
-
-		// If packet didn't come from ourselves (yes, this happens)
-		if( vehicle->GetVehicleId() != packet.GetSource() )
+		if(packet.GetSource() < vehicle->GetVehicleId() )
 		{
-			// Create a new packet, use earlier spawned header, update source
-			VanetHeader newPacket = packet;
-			newPacket.SetSource(vehicle->GetVehicleId());
-			newPacket.SetTimestamp(nowtime.ns3::Time::GetSeconds());
+			double packetDelay = nowtime.ns3::Time::GetSeconds() - packet.GetTimestamp();
 
-			// Immediate re-broadcast of packet
-			broadcastPacket(vehicle, newPacket);
+			/* determine range (source TX position to us)
+			 * get src vehicle handle, get src vehicle position
+			 */
+			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(packet.GetSource());
+			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
 
-			// Save packet in re-broadcast list
-			vehicle->AddPacket(newPacket);
+			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
+					<< " SRC " << packet.GetSource()
+					<< " DST " << vehicle->GetVehicleId()
+					<< " ID " << packet.GetID()
+					<< " DELAY " << packetDelay;
+				if(packetDelay>0.1)	// safe criteria for direct/not direct
+				cout<< " RANGE " << range;
+				cout<< '\n';
+
+			// print the distance to the next node
+			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
+			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
+			cout << "DEBUG CAR " << vehicle->GetVehicleId() << " NEXT CAR " << vehicle->GetVehicleId()+1 << " DISTANCE " << nextHopDistance << '\n';
 		}
+		/* === DEBUG CODE END === */
+
+		// Create a new packet, use earlier spawned header, update source
+		VanetHeader newPacket = packet;
+		newPacket.SetTimestamp(nowtime.ns3::Time::GetSeconds());
+
+		// Save packet in re-broadcast list
+		vehicle->AddPacket(newPacket);
+
+		// Immediate re-broadcast of packet
+		broadcastPacket(vehicle, newPacket);
 	}
 
 	/*
