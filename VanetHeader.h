@@ -21,8 +21,8 @@ class VanetHeader : public Header
 		int16_t m_src;
 		uint16_t m_id;
 		uint64_t m_timestamp;
-		int64_t m_posRX;	// vehicle position when packet was received
-		int64_t m_posTX;	// vehicle position right before packet is transmitted
+//		int64_t m_posRX;	// vehicle position when packet was received
+//		int64_t m_posTX;	// vehicle position right before packet is transmitted
 	public:
 		VanetHeader();
 		virtual ~VanetHeader();
@@ -30,13 +30,13 @@ class VanetHeader : public Header
 		void SetSource(int src);
 		void SetID(unsigned int id);
 		void SetTimestamp(double time);
-		void SetPosRX(double pos);
-		void SetPosTX(double pos);
+//		void SetPosRX(double pos);
+//		void SetPosTX(double pos);
 		int GetSource(void) const;
 		unsigned int GetID(void) const;
 		double GetTimestamp(void) const;
-		double GetPosRX(void);
-		double GetPosTX(void);
+//		double GetPosRX(void);
+//		double GetPosTX(void);
 
 
 		static TypeId GetTypeId (void);

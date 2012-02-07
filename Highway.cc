@@ -212,7 +212,7 @@ namespace ns3
 				if(uRnd2.GetValue() <= m_penetrationRate) 
 				{
 					temp->IsEquipped = true;
-					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+//					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
 				}
 				else
 				{
@@ -242,7 +242,7 @@ namespace ns3
                 if(uRnd2.GetValue() <= m_penetrationRate)
 				{
 					temp->IsEquipped = true;
-					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+//					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
 				}
 			    else
 				{
@@ -293,7 +293,7 @@ namespace ns3
                 if(uRnd2.GetValue() <= m_penetrationRate)
 				{
 					temp->IsEquipped = true;
-					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+//					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
 				}
 			    else
 				{
@@ -323,7 +323,7 @@ namespace ns3
                 if(uRnd2.GetValue() <= m_penetrationRate)
 				{
 					temp->IsEquipped = true;
-					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+//					temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
 				}
 				else
 				{
@@ -730,9 +730,19 @@ namespace ns3
 	  m_brakingAccel = acc;
   }
 
+  void Highway::SetRange(double range)
+  {
+	  m_range = range;
+  }
+
   double Highway::GetBrakingAccel(void)
   {
 	  return m_brakingAccel;
+  }
+
+  double Highway::GetRange(void)
+  {
+	  return m_range;
   }
 
   Ptr<Vehicle> Highway::CreateVehicle(int direction)
@@ -741,7 +751,7 @@ namespace ns3
 	double velocity = (direction==1) ? m_velocityDirPos : m_velocityDirNeg;
 
 	temp->IsEquipped = true;
-	temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+//	temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
 	temp->SetVehicleId(m_vehicleId++);
 	temp->SetDirection(direction);
 	temp->SetPosition(Vector( (direction==1)?(-4):(m_highwayLength+4) , GetYForLane(0,direction), 0));
@@ -766,7 +776,7 @@ namespace ns3
 	Ptr<Vehicle> temp=CreateObject<Vehicle>();
 
 	temp->IsEquipped = true;
-	temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
+//	temp->SetupWifi(m_wifiHelper, m_wifiPhyHelper, m_wifiMacHelper);
 	temp->SetVehicleId(m_vehicleId++);
 	temp->SetDirection(direction);
 	temp->SetPosition(Vector(location, GetYForLane(0,direction), 0));
@@ -1052,12 +1062,12 @@ namespace ns3
 
     return segment;		
   }
-  Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> Highway::GetReceiveDataCallback()
+  Callback<void, Ptr<Vehicle>, VanetHeader> Highway::GetReceiveDataCallback()
   {
     return m_receiveData;
   }
 
-  void Highway::SetReceiveDataCallback(Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> receiveData)
+  void Highway::SetReceiveDataCallback(Callback<void, Ptr<Vehicle>, VanetHeader> receiveData)
   {
     m_receiveData = receiveData;
   }

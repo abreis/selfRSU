@@ -87,6 +87,7 @@ namespace ns3
       YansWifiChannelHelper m_wifiChannelHelper; // a wifi channel helper apply to setup vehicles Wifi
       Ptr<YansWifiChannel> m_wifiChannel;   // the common Wifi Channel created by Highway which is being shared by the vehicles to communicate.
       double m_brakingAccel;				// sudden braking acceleration
+      double m_range;						// vehicle radio range
 
       /// Initializes the Highway and raises the event InitVehicle.
       void InitHighway();
@@ -331,7 +332,9 @@ namespace ns3
 	  void SetSpeedRV(RandomVariable rv);
 
 	  void SetBrakingAccel(double acc);
+	  void SetRange(double range);
 	  double GetBrakingAccel(void);
+	  double GetRange(void);
 	  Ptr<Vehicle> CreateVehicle(int direction);
 	  Ptr<Vehicle> CreateVehicle(int direction, double velocity, double location, bool control);
 	  static void ExponentialAddVehicles(Ptr<Highway> highway, int direction);

@@ -54,16 +54,16 @@ namespace ns3
   {
   }
 
-  void Vehicle::SetupWifi(const WifiHelper &wifi, const YansWifiPhyHelper &phy, const NqosWifiMacHelper &mac)
-  {
-    if(IsEquipped==false) return;
-    NetDeviceContainer d;
-	NodeContainer n(m_node);
-    d = wifi.Install(phy, mac, n);
-
-    m_device = d.Get(0);
-    m_device->SetReceiveCallback(MakeCallback(&Vehicle::ReceivePacket, this));
-  }
+//  void Vehicle::SetupWifi(const WifiHelper &wifi, const YansWifiPhyHelper &phy, const NqosWifiMacHelper &mac)
+//  {
+//    if(IsEquipped==false) return;
+//    NetDeviceContainer d;
+//	NodeContainer n(m_node);
+//    d = wifi.Install(phy, mac, n);
+//
+//    m_device = d.Get(0);
+//    m_device->SetReceiveCallback(MakeCallback(&Vehicle::ReceivePacket, this));
+//  }
 
   void Vehicle::SetDirection(int value)
   {
@@ -229,12 +229,20 @@ namespace ns3
       }
   }
 
-  bool Vehicle::ReceivePacket(Ptr<NetDevice> device, Ptr<const Packet> packet,uint16_t protocol,const Address& address)
-  {
-    if(!m_receive.IsNull()) 
-	  m_receive(Ptr<Vehicle>(this), packet, address);
-    return true;
-  }
+//  bool Vehicle::ReceivePacket(Ptr<NetDevice> device, Ptr<const Packet> packet,uint16_t protocol,const Address& address)
+//  {
+//    if(!m_receive.IsNull())
+//	  m_receive(Ptr<Vehicle>(this), packet, address);
+//    return true;
+//  }
+
+	bool Vehicle::ReceivePacket(VanetHeader packet)
+	{
+	  if(!m_receive.IsNull())
+		  m_receive(Ptr<Vehicle>(this), packet);
+	  return true;
+	}
+
 
   Address Vehicle::GetAddress()
   {

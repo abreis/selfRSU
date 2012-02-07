@@ -41,7 +41,8 @@ namespace ns3
   class HadiHeader;
   
   /// define type VehicleReceiveCallback.
-  typedef Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> VehicleReceiveCallback;
+//  typedef Callback<void, Ptr<Vehicle>, Ptr<const Packet>, Address> VehicleReceiveCallback;
+  typedef Callback<void, Ptr<Vehicle>, VanetHeader> VehicleReceiveCallback;
 
   /**
   * \brief Vehicle is a mobile Object which follows the given IDM/MOBIL mobility Model and LaneChange rules.
@@ -96,7 +97,7 @@ namespace ns3
       * Setups the Vehicle wifi given the appropriate helpers.
 	  * This function may need to be modified later if stable WAVE/DSRC standards added to ns-3.
       */
-      void SetupWifi(const WifiHelper &wifi, const YansWifiPhyHelper &phy, const NqosWifiMacHelper &mac);
+//      void SetupWifi(const WifiHelper &wifi, const YansWifiPhyHelper &phy, const NqosWifiMacHelper &mac);
       /**
       * \returns the Vehicle Id.
 	  *
@@ -283,9 +284,10 @@ namespace ns3
 	  /// used for purpose of considering market penetration rate.
 	  bool IsEquipped;  
 
-    protected:
       /// ReceiverPacket handler. This is the handler which catches the Vehicle's Receive Data event.
-      bool ReceivePacket(Ptr<NetDevice> device,Ptr<const Packet> packet,uint16_t protocol,const Address& address);
+	  bool ReceivePacket(VanetHeader packet);
+//      bool ReceivePacket(Ptr<NetDevice> device,Ptr<const Packet> packet,uint16_t protocol,const Address& address);
+    protected:
 
   };
 };
