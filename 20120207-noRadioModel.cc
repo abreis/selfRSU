@@ -220,20 +220,13 @@ static void ReceiveData(Ptr<Vehicle> vehicle, VanetHeader packet)
 //			 */
 //			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(packet.GetSource());
 //			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
-//
-//			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
-//					<< " SRC " << packet.GetSource()
-//					<< " DST " << vehicle->GetVehicleId()
-//					<< " ID " << packet.GetID()
-//					<< " DELAY " << packetDelay;
-//				if(packetDelay>0.1)	// safe criteria for direct/not direct
-//				cout<< " RANGE " << range;
-//				cout<< '\n';
-//
-//			// print the distance to the next node
-//			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
-//			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
-//			cout << "DEBUG CAR " << vehicle->GetVehicleId() << " NEXT CAR " << vehicle->GetVehicleId()+1 << " DISTANCE " << nextHopDistance << '\n';
+//			cout << "eSinter " << range;
+
+			// print the distance to the next node
+			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
+			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
+			if(nextHopDistance > g_highway->GetRange())
+				cout << "eSinter " << nextHopDistance << '\n';
 		}
 		/* === DEBUG CODE END === */
 
