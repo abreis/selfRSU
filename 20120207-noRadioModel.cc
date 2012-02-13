@@ -208,30 +208,30 @@ static void ReceiveData(Ptr<Vehicle> vehicle, VanetHeader packet)
 		 * Cars are added linearly, so just check if source ID is smaller than ours
 		 */
 		// if we got this packet from a vehicle in front of us
-		if(packet.GetSource() < vehicle->GetVehicleId() )
-		{
-			double packetDelay = nowtime.ns3::Time::GetSeconds() - packet.GetTimestamp();
-
-			/* determine range (source TX position to us)
-			 * get src vehicle handle, get src vehicle position
-			 */
-			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(packet.GetSource());
-			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
-
-			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
-					<< " SRC " << packet.GetSource()
-					<< " DST " << vehicle->GetVehicleId()
-					<< " ID " << packet.GetID()
-					<< " DELAY " << packetDelay;
-				if(packetDelay>0.1)	// safe criteria for direct/not direct
-				cout<< " RANGE " << range;
-				cout<< '\n';
-
-			// print the distance to the next node
-			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
-			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
-			cout << "DEBUG CAR " << vehicle->GetVehicleId() << " NEXT CAR " << vehicle->GetVehicleId()+1 << " DISTANCE " << nextHopDistance << '\n';
-		}
+//		if(packet.GetSource() < vehicle->GetVehicleId() )
+//		{
+//			double packetDelay = nowtime.ns3::Time::GetSeconds() - packet.GetTimestamp();
+//
+//			/* determine range (source TX position to us)
+//			 * get src vehicle handle, get src vehicle position
+//			 */
+//			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(packet.GetSource());
+//			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
+//
+//			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
+//					<< " SRC " << packet.GetSource()
+//					<< " DST " << vehicle->GetVehicleId()
+//					<< " ID " << packet.GetID()
+//					<< " DELAY " << packetDelay;
+//				if(packetDelay>0.1)	// safe criteria for direct/not direct
+//				cout<< " RANGE " << range;
+//				cout<< '\n';
+//
+//			// print the distance to the next node
+//			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
+//			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
+//			cout << "DEBUG CAR " << vehicle->GetVehicleId() << " NEXT CAR " << vehicle->GetVehicleId()+1 << " DISTANCE " << nextHopDistance << '\n';
+//		}
 		/* === DEBUG CODE END === */
 
 		// Create a new packet, use earlier spawned header, update source
@@ -243,136 +243,28 @@ static void ReceiveData(Ptr<Vehicle> vehicle, VanetHeader packet)
 
 		// Immediate re-broadcast of packet
 		broadcastPacket(vehicle, newPacket);
-	}
 
-	/*
-	 * Actions based on packet payload. If ID=1337, order vehicle to brake
-	 * Only eastbound vehicles brake
-	 * If emergency braking acceleration is set to 0.0, then ignore this process
-	 */
-	if(packet.GetID()==1337)
-		if(vehicle->GetDirection()==1)
-			if(vehicle->GetBrakingAccel()!=0.0)
-			{
-				vehicle->SetManualControl(true);
-				vehicle->SetAcceleration(vehicle->GetBrakingAccel());
-			}
+		/*
+		 * Actions based on packet payload. If ID=1337, order vehicle to brake
+		 * Only eastbound vehicles brake
+		 * If emergency braking acceleration is set to 0.0, then ignore this process
+		 */
+		if(packet.GetID()==1337)
+			if(vehicle->GetDirection()==1)
+				if(vehicle->GetBrakingAccel()!=0.0)
+				{
+					vehicle->SetManualControl(true);
+					vehicle->SetAcceleration(vehicle->GetBrakingAccel());
+				}
 
-	// Break simulation if this is the destination vehicle getting the packet
-	if(vehicle->GetVehicleId()==g_endVehicleID)
-	{
-		cout << "DING " << nowtime.ns3::Time::GetSeconds() << '\n';
-		Simulator::Stop();
-	}
-
+		// Break simulation if this is the destination vehicle getting the packet
+		if(vehicle->GetVehicleId()==g_endVehicleID)
+		{
+			cout << "DING " << nowtime.ns3::Time::GetSeconds() << '\n';
+			Simulator::Stop();
+		}
+	}	// end if isNew==true
 }
-
-
-//static void ReceiveData(Ptr<Vehicle> vehicle, Ptr<const Packet> packet, Address address)
-//{
-//	// Extract PacketID
-//	VanetHeader vHeader;
-//	packet->PeekHeader(vHeader);
-//
-//	// Log packet reception
-//	ns3::Time nowtime = ns3::Simulator::Now();
-//	cout << "LOG " << nowtime.ns3::Time::GetSeconds() << " P"
-//			<< " SRC " << vHeader.GetSource()
-//			<< " DST " << vehicle->GetVehicleId()
-//			<< " ID " << vHeader.GetID()
-//			<< '\n';
-//
-//	/*
-//	 * Check if we already have this packet
-//	 */
-//	list<VanetHeader> plist = vehicle->GetPacketList();	// get vehicle's packet list
-//	list<VanetHeader>::iterator iter = plist.begin();		// iterator
-//	bool isNew=true;
-//	while( iter != plist.end() && isNew==true )
-//	{
-//		if(iter->GetID() == vHeader.GetID()) isNew=false;
-//		++iter;
-//	}
-//
-//	// If this is a new packet
-//	if(isNew==true)
-//	{
-//		/* === DEBUG CODE === */
-//		/* vHeader is modified in this routine, debug code must go here
-//		 * If this is a new packet, print distance to previous vehicle,
-//		 * delay from previous vehicle
-//		 *
-//		 * ? Store absolute position so as to determine when packet is going in the right or wrong direction
-//		 * Cars are added linearly, so just check if source ID is smaller than ours
-//		 */
-//
-//		// if we got this packet from a vehicle in front of us
-//		if(vHeader.GetSource() < vehicle->GetVehicleId() )
-//		{
-//
-//			double packetDelay = nowtime.ns3::Time::GetSeconds() - vHeader.GetTimestamp();
-//
-//			/* determine range (source TX position to us)
-//			 * get src vehicle handle, get src vehicle position
-//			 */
-//			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(vHeader.GetSource());
-//			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
-//
-//			cout 	<< "DEBUG " << nowtime.ns3::Time::GetSeconds() << " P"
-//					<< " SRC " << vHeader.GetSource()
-//					<< " DST " << vehicle->GetVehicleId()
-//					<< " ID " << vHeader.GetID()
-//					<< " DELAY " << packetDelay
-////			if(packetDelay>0.1)	// safe criteria for direct/not direct
-//					<< " RANGE " << range
-//					<< '\n';
-//
-//			// print the distance to the next node
-//			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
-//			double nextHopDistance = vehicle->GetPosition().x - nextVeh->GetPosition().x;
-//			cout << "DEBUG CAR " << vehicle->GetVehicleId() << " NEXT CAR " << vehicle->GetVehicleId()+1 << " DISTANCE " << nextHopDistance << '\n';
-//		}
-//		/* === DEBUG CODE END === */
-//
-//
-//		// If packet didn't come from ourselves (yes, this happens)
-//		if( vehicle->GetVehicleId() != vHeader.GetSource() )
-//		{
-//
-//			// Create a new packet, use earlier spawned header, update source
-//			Ptr<Packet> newPacket = Create<Packet>();
-//			vHeader.SetSource(vehicle->GetVehicleId());
-//			vHeader.SetTimestamp(nowtime.ns3::Time::GetSeconds());
-//			newPacket->AddHeader(vHeader);
-//
-//			// Immediate re-broadcast of packet
-//			vehicle->SendTo(vehicle->GetBroadcastAddress(), newPacket);
-//
-//			// Save packet in re-broadcast list
-//			vehicle->AddPacket(vHeader);
-//		}
-//	}
-//
-//	/*
-//	 * Actions based on packet payload. If ID=1337, order vehicle to brake
-//	 * Only eastbound vehicles brake
-//	 * If emergency braking acceleration is set to 0.0, then ignore this process
-//	 */
-//	if(vHeader.GetID()==1337)
-//		if(vehicle->GetDirection()==1)
-//			if(vehicle->GetBrakingAccel()!=0.0)
-//			{
-//				vehicle->SetManualControl(true);
-//				vehicle->SetAcceleration(vehicle->GetBrakingAccel());
-//			}
-//
-//	// Break simulation if this is the destination vehicle getting the packet
-//	if(vehicle->GetVehicleId()==g_endVehicleID)
-//	{
-//		cout << "DING " << nowtime.ns3::Time::GetSeconds() << '\n';
-//		Simulator::Stop();
-//	}
-//}
 
 int main (int argc, char *argv[])
 { 
