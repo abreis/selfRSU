@@ -213,14 +213,20 @@ static void ReceiveData(Ptr<Vehicle> vehicle, VanetHeader packet)
 		if(packet.GetSource() < vehicle->GetVehicleId() )
 		{
 			double packetDelay = nowtime.ns3::Time::GetSeconds() - packet.GetTimestamp();
-			if(packetDelay>0.1) s_nhops++;	// increase hop count when range>250 (thus delay>0)
+			if(packetDelay>0.1)
+			{
+				s_nhops++;	// increase hop count when range>250 (thus delay>0)
 
-//			/* determine range (source TX position to us)
+				// print packet delay (previous eSinter print determines condition)
+				cout << "DELAY " << packetDelay << '\n';
+			}
+
+//			/* The following code prints *real* range (source vehicle distance to us)
 //			 * get src vehicle handle, get src vehicle position
 //			 */
 //			Ptr<Vehicle> srcVeh = g_highway->FindVehicle(packet.GetSource());
 //			double range = srcVeh->GetPosition().x - vehicle->GetPosition().x;
-//			cout << "eSinter " << range;
+//			cout << "RANGE " << range;
 
 			// print the distance to the next node
 			Ptr<Vehicle> nextVeh = g_highway->FindVehicle(vehicle->GetVehicleId()+1);
