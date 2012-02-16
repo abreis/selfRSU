@@ -219,6 +219,14 @@ static void ReceiveData(Ptr<Vehicle> vehicle, VanetHeader packet)
 
 				// print packet delay (previous eSinter print determines condition)
 				cout << "DELAY " << packetDelay << '\n';
+
+				// delay condition: source vehicle was either still braking (v>0) or stopped (v==0)
+				Ptr<Vehicle> srcVeh = g_highway->FindVehicle(packet.GetSource());
+				if(srcVeh->GetVelocity() > 0)
+					cout << "SRCISBRAKING " << packetDelay << '\n';
+				else
+					cout << "SRCISSTOPPED " << packetDelay << '\n';
+
 			}
 
 //			/* The following code prints *real* range (source vehicle distance to us)
